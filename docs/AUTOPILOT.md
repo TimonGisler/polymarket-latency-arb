@@ -4,7 +4,13 @@ Owner, 2026-11-15: "ideally I personally do not want to have to do anything". On
 
 ## The task
 "Latency-arb nightly": every night 00:17 Europe/Zurich, a fresh Claude session on this server in this folder.
-Id `trig_01AugRicT6gW4T18Z7azJ1a8`, first run 2026-11-15 23:17 UTC; it carries no connectors (none needed). Find or change it with the
+Id `trig_01AugRicT6gW4T18Z7azJ1a8`, first run 2026-11-15 23:17 UTC, model `claude-opus-5-5` (owner: at least Opus);
+it carries no connectors (none needed).
+
+"Latency-arb verdict": one-off, **Sunday 2026-11-22 08:30 Europe/Zurich** (`trig_01Rd1ZtaAekhRzbUaHwuLqLG`, Opus). It
+does plan step 6 and pushes the verdict to the owner's phone. Owner, 2026-11-15: the verdict must be on his phone by
+Sunday 11-22 around 12:00 Zurich at the latest, so he has the weekend to work on it. The nightly run at 00:17 that
+Sunday prepares everything (the replay on all days ready to run), so the verdict session only runs and writes it. Find or change it with the
 scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: read
 `CLAUDE.md`, the README and this file, then do "A session's job" below.
 
@@ -17,7 +23,7 @@ scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: 
    - Broken? Fix it first (`docker compose up -d recorder`), and say what happened in the LOG.
 2. **The next open step** of the [plan](../README.md#plan). One step per night is fine; don't rush money code.
 3. **Write it down:** a dated entry in [LOG.md](LOG.md) (result first, with numbers, negative ones too), update the
-   README ("Where it stands", the plan table, "Needs the owner"), commit. The owner reads the status page (`dashboard.py`), which shows those README sections and the newest
+   README ("Where it stands", the plan table, "Needs the owner"), commit and `git push`. The owner reads the status page (`dashboard.py`), which shows those README sections and the newest
    LOG entry, so keep them short and current; the trader writes `data/trader/summary.json` for it.
 4. **Tell the owner only when needed:** `sh scripts/notify.sh "title" "text"` for something only he can do, and for
    the verdict. Nothing else.

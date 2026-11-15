@@ -31,7 +31,7 @@ open step ([docs/AUTOPILOT.md](docs/AUTOPILOT.md)). Update the Status column as 
 | 3 | Build `trader.py`: the same rule in real time. Paper mode first (logs each decision, and the book when the order would have landed). The wallet is ready ([Needs the owner](#needs-the-owner)); work out how winning shares turn back into cash (redeem) so $30 keeps trading | night to 11-18 | open |
 | 4 | Real orders at the minimum size (5 shares), $30 total loss cap in code, more than 60 s left in the window. Log for each order: sent, acknowledged, filled or not, fill price, and what the replay predicted for the same event. Needs the funded wallet | from 11-18 | open (wallet funded 11-15) |
 | 5 | Every night: health check, and one line in the LOG with trades so far and disk free | nightly | open |
-| 6 | Verdict: [the test](#the-test-fixed-2026-11-15) on all recorded days, plus real fills against the replay's prediction. Write it at the top of this file and push it to the owner's phone | 11-21 / 11-22 | open |
+| 6 | Verdict: [the test](#the-test-fixed-2026-11-15) on all recorded days, plus real fills against the replay's prediction. Write it at the top of this file and push it to the owner's phone. Done by the task "Latency-arb verdict" | **Sun 11-22 08:30 Zurich; on the phone by 12:00 at the latest** | open |
 
 **What the real orders are for.** $30 buys roughly 200–400 minimum-size trades (the fee alone is ~8c per trade). That
 cannot prove profit. It answers what a replay can't: how often our order really fills at the price the book showed,
@@ -61,13 +61,16 @@ extra rows.
 |---|---|---|
 | `latency-recorder` (container, [docker-compose.yml](docker-compose.yml)) | Records BTC 5m books and prints (compact `pmc`), Binance and Coinbase trades, Chainlink → `data/ext/crypto/live/`, ~0.25 GB/day in total; pauses under ~6.4 GB free disk (`df` Avail) | `docker logs --tail 3 latency-recorder`; `docker compose stop recorder` |
 | `latency-dashboard` (container, [dashboard.py](dashboard.py)) | Read-only status page: is the recorder working, what it sees, plan, what the owner must do, orders (reads `data/status.json`, `data/trader/summary.json`, README, LOG) | **https://latency.77-42-11-137.sslip.io**, with the LP dashboard's login (`DASHBOARD_USER` / `DASHBOARD_PASSWORD` in `/root/polymarket-bot/.env`); on the server also `localhost:8081`. Served by the LP bot's caddy (last block of `/root/polymarket-bot/Caddyfile`) |
-| Scheduled task "Latency-arb nightly" | Runs the plan, 00:17 Europe/Zurich | [docs/AUTOPILOT.md](docs/AUTOPILOT.md) |
+| Scheduled tasks "Latency-arb nightly" (00:17 Zurich) and "Latency-arb verdict" (Sun 11-22 08:30 Zurich), both Opus | Run the plan | [docs/AUTOPILOT.md](docs/AUTOPILOT.md) |
 
 ## Needs the owner
 - Nothing right now. The wallet is there (2026-11-15): key in `/root/polymarket-latency-arb/.env.wallet` (`PK=...`,
   root-only, gitignored), **$30.00 cash in its Polymarket proxy** `0xF82E76a7fDa4Df8ED7D88545B3180B7C20FE45C0`
   (`signature_type=1`), no open orders. Check it any time, read-only: see the top of [wallet_check.py](wallet_check.py).
-- Later, not urgent: this repo has no git remote, so it exists only on this server. And the disk: both projects
+- **Add the deploy key to GitHub** so the server can push this repo: github.com/TimonGisler/polymarket-latency-arb →
+  Settings → Deploy keys → Add, tick "Allow write access", paste `/root/.ssh/github_deploy_latency.pub` (public part
+  only; the repo uses it via `git config core.sshCommand`). Then any session runs `git push -u origin master`.
+- Later, not urgent: the disk: both projects
   record onto 8.5 GB free (see `/root/polymarket-bot/docs/STATUS.md`).
 
 ## Layout

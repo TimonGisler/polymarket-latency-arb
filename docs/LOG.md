@@ -66,3 +66,11 @@ separate Polymarket account; it is in `.env.wallet` (root-only, gitignored). API
 fresh one: ~100 past trades (2025), a redeem on 2026-10-18, and two resolved losing positions worth $0 that still show
 as "redeemable". So the trader must count only its own trades, not the account's history. The key was pasted in the
 chat, so treat it as a $30 test wallet only; a new key before any larger amount.
+
+**Owner, ~19:30 UTC:** (1) verdict on his phone by Sunday 2026-11-22 ~12:00 Zurich at the latest: one-off task
+"Latency-arb verdict" set for 08:30 Zurich that day. (2) Scheduled sessions must run at least Opus: both tasks set to
+`claude-opus-5-5` (the nightly one had the default model before). (3) Remote: `origin` =
+`git@github.com:TimonGisler/polymarket-latency-arb.git` (the owner created the empty repo). The LP bot's key can't push
+here: GitHub deploy keys work for one repository only. A new key `/root/.ssh/github_deploy_latency` was made and this
+repo uses it (`core.sshCommand`, so `~/.ssh/config` is unchanged); the owner has to add its public part as a deploy key
+with write access. Until then pushes fail and the work stays in the local commits.
