@@ -4,7 +4,8 @@ Owner, 2026-11-15: "ideally I personally do not want to have to do anything". On
 
 ## The task
 "Latency-arb nightly": every night 00:17 Europe/Zurich, a fresh Claude session on this server in this folder.
-Find or change it with the scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: read
+Id `trig_01AugRicT6gW4T18Z7azJ1a8`, first run 2026-11-15 23:17 UTC; it carries no connectors (none needed). Find or change it with the
+scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: read
 `CLAUDE.md`, the README and this file, then do "A session's job" below.
 
 ## A session's job
