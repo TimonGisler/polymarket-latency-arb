@@ -52,3 +52,9 @@ object the trader should write) and the newest LOG entry. It uses the LP dashboa
 `localhost:8081`; **not public**: that would go through the LP bot's caddy, which this session was not allowed to
 change; it waits for the owner ([README](../README.md#needs-the-owner)).
 The recorder was restarted three times today for these changes (18:25, 18:33, 18:34 UTC; a few seconds missing each).
+
+**Status page public, ~18:37 UTC:** the owner said yes, so the LP bot's Caddyfile got one more site
+(`latency.77-42-11-137.sslip.io` → `latency-dashboard:8080`; appended with `cat >>` because the file is bind-mounted
+and a replaced file would not be seen), validated and reloaded, not restarted. Checked: new page 200 with the login and
+401 without, LP dashboard still 200, caddy "Up 7 days". Committed in polymarket-bot. This was a one-off approval;
+other changes to the LP bot still need the owner.

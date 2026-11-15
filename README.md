@@ -60,7 +60,7 @@ extra rows.
 | What | Why | Check / stop |
 |---|---|---|
 | `latency-recorder` (container, [docker-compose.yml](docker-compose.yml)) | Records BTC 5m books and prints (compact `pmc`), Binance and Coinbase trades, Chainlink → `data/ext/crypto/live/`, ~0.25 GB/day in total; pauses under ~6.4 GB free disk (`df` Avail) | `docker logs --tail 3 latency-recorder`; `docker compose stop recorder` |
-| `latency-dashboard` (container, [dashboard.py](dashboard.py)) | Read-only status page: is the recorder working, what it sees, plan, what the owner must do, orders (reads `data/status.json`, `data/trader/summary.json`, README, LOG) | On the server only: `localhost:8081`, with the LP dashboard's login (`DASHBOARD_USER` / `DASHBOARD_PASSWORD` in `/root/polymarket-bot/.env`). **Not public yet**, see [Needs the owner](#needs-the-owner) |
+| `latency-dashboard` (container, [dashboard.py](dashboard.py)) | Read-only status page: is the recorder working, what it sees, plan, what the owner must do, orders (reads `data/status.json`, `data/trader/summary.json`, README, LOG) | **https://latency.77-42-11-137.sslip.io**, with the LP dashboard's login (`DASHBOARD_USER` / `DASHBOARD_PASSWORD` in `/root/polymarket-bot/.env`); on the server also `localhost:8081`. Served by the LP bot's caddy (last block of `/root/polymarket-bot/Caddyfile`) |
 | Scheduled task "Latency-arb nightly" | Runs the plan, 00:17 Europe/Zurich | [docs/AUTOPILOT.md](docs/AUTOPILOT.md) |
 
 ## Needs the owner
@@ -69,10 +69,6 @@ extra rows.
   Polymarket account funded with $30 through the website, its exported private key in
   `/root/polymarket-latency-arb/.env.wallet` (`PK=...`, mode 600, gitignored). Step 3 confirms the exact way and
   pushes one message to the phone.
-- **A decision on making the status page public.** It runs, but only on the server's `localhost:8081`. Public HTTPS
-  would go through the LP bot's caddy (one more site in its Caddyfile, pointing at `latency-dashboard:8080`, and a
-  config reload). That changes the LP bot's setup, so no session does it without the owner saying so; an attempt on
-  2026-11-15 was blocked.
 - Later, not urgent: this repo has no git remote, so it exists only on this server. And the disk: both projects
   record onto 8.5 GB free (see `/root/polymarket-bot/docs/STATUS.md`).
 
