@@ -33,3 +33,7 @@ small: about $150–600/day at ≤ 100 shares. ETH has no edge left by 500 ms. A
 - `requirements.txt`: Python packages (copy of the main repo's at the time of parking).
 - `data/` (gitignored): **empty.** The historical data was never on the server and the old forward recordings are lost; re-download history with the
   `dl_*.py` / `fetch_gamma*.py` scripts. Scripts find `data/` relative to the project root.
+
+## Sessions
+Remote Control serves this folder as `polymarket-latency-arb` (systemd `claude-rc-latency.service`, loop script
+`/usr/local/bin/claude-rc-latency-loop.sh`). Console: `tmux -L claude-latency attach` (detach: Ctrl-b d).
