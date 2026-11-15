@@ -7,19 +7,69 @@ Split out of `polymarket-bot` (folder `parked/research/crypto_updown`, phase 1, 
 Nothing here depends on that repo.
 
 ## Where it stands
-**PROMISING, unconfirmed.** History after the bias audit: about +3–4% per trade in-sample, +7% out-of-sample.
-A 3.6 h forward test on live data: +9% at ≥ 3 bp, p ≈ 0.1 (not significant). It's a speed race, and capacity is
-small: about $150–600/day at ≤ 100 shares. ETH has no edge left by 500 ms. All numbers and the audit:
-[research/crypto_updown/README.md](research/crypto_updown/README.md). No real orders have ever been placed.
+Updated 2026-11-15. History: [docs/LOG.md](docs/LOG.md).
 
-## Next steps (no money until step 3 is clearly positive)
-1. **Measure latency from the server** (Helsinki) to `clob.polymarket.com` and to the Binance stream. The edge exists
-   only at sub-second latency, so it may not exist from this server.
-2. **Record 1–2 weeks** with `python3 research/crypto_updown/live_fwd.py --hours <h>` (writes `data/ext/crypto/live/`).
-3. **Replay** with `python3 research/crypto_updown/live_replay.py` at the measured latency. The key question is
-   whether orders would actually fill at the stale price, not only whether the signal predicts the move.
-4. Only if significant over several days: paper-trade in real time, then tiny size. Require > 60 s left in the
-   window (settlement uses a TWAP).
+**PROMISING, unconfirmed. A one-week test is running; verdict due 2026-11-22.** History after the bias audit: about
++3–4% per trade in-sample, +7% out-of-sample. A 3.6 h forward test on 2026-10-13: +9% at ≥ 3 bp, p ≈ 0.1 (not
+significant). It's a speed race, and capacity is small: about $150–600/day at ≤ 100 shares. ETH has no edge left by
+500 ms. All numbers and the audit: [research/crypto_updown/README.md](research/crypto_updown/README.md). No real orders
+have ever been placed.
+
+- Rules today are the ones the forward test ran under (150 ms taker delay, 0.07 fee, 60 s TWAP; checked 11-15).
+- From this server Binance trades arrive ~144 ms late and a CLOB request takes ~53 ms round trip. That is ~130 ms
+  slower on the signal than the 10-13 test.
+- The recorder has been running since 2026-11-15 18:22 UTC.
+
+## Plan
+The question for 2026-11-22: **is this worth more of the owner's time?** One scheduled session a night does the next
+open step ([docs/AUTOPILOT.md](docs/AUTOPILOT.md)). Update the Status column as you go.
+
+| # | Step | Target | Status |
+|---|---|---|---|
+| 1 | Re-check rules, measure latency, start the recorder | 11-15 | **done** ([LOG](docs/LOG.md#2026-11-15)) |
+| 2 | Make `live_replay.py` read the compact `pmc` stream (rebuild the Up book; Down = mirror). Find why 0.42% of rebuilt best prices disagree and count fills that touch a level of unknown size. Run [the test](#the-test-fixed-2026-11-15) on the first day as a dry run of the tooling, not as a result | night to 11-17 | open |
+| 3 | Build `trader.py`: the same rule in real time. Paper mode first (logs each decision, and the book when the order would have landed). Work out the wallet with the least owner work, then ask him for exactly one thing ([Needs the owner](#needs-the-owner)) | night to 11-18 | open |
+| 4 | Real orders at the minimum size (5 shares), $30 total loss cap in code, more than 60 s left in the window. Log for each order: sent, acknowledged, filled or not, fill price, and what the replay predicted for the same event. Needs the funded wallet | from 11-18, as soon as funded | open, waits for the owner |
+| 5 | Every night: health check, and one line in the LOG with trades so far and disk free | nightly | open |
+| 6 | Verdict: [the test](#the-test-fixed-2026-11-15) on all recorded days, plus real fills against the replay's prediction. Write it at the top of this file and push it to the owner's phone | 11-21 / 11-22 | open |
+
+**What the real orders are for.** $30 buys roughly 200–400 minimum-size trades (the fee alone is ~8c per trade). That
+cannot prove profit. It answers what a replay can't: how often our order really fills at the price the book showed,
+and how long an order really takes. The profit estimate comes from the replay, corrected by that fill rate.
+
+**Verdict rule** (written before the data): continue if the fixed test is positive with p < 0.01 over at least 5 days
+and positive on most days, **and** real orders fill at least about as often and as cheaply as the replay says. Stop
+if the replay is not positive, or if real fills are clearly worse. Anything between: say so, and say what one more
+week would settle.
+
+## The test (fixed 2026-11-15)
+Set before any new data was looked at. Never tune it on the recording; other settings may appear only as marked
+extra rows.
+- Market: BTC 5-minute up/down. Signal: Binance BTCUSDT moved ≥ **3 bp** within the last 1 s, seen at our receive
+  time; buy the side the move favours; 5 s cooldown; only with **more than 60 s** left in the window.
+- Execution: the order reaches the book **250 ms** after we received the Binance trade (150 ms taker delay + 100 ms
+  for our round trip and compute; replace the 100 ms with the measured order round trip once step 4 has one).
+  Marketable limit at the ask seen at decision + 2c, walking displayed depth, at most 100 shares, only levels that
+  still exist then.
+- Costs and outcome: fee `shares × 0.07 × p × (1−p)`, settled on the official gamma outcome.
+- Statistics: ROI on cost including fees; bootstrap clustered by window; one-sided p; also per-day ROI.
+- Sensitivity rows (not the verdict): execution at 200 / 350 ms (is a closer server worth it?), threshold 5 bp,
+  Coinbase as the signal.
+
+## What runs
+| What | Why | Check / stop |
+|---|---|---|
+| `latency-recorder` (container, [docker-compose.yml](docker-compose.yml)) | Records BTC 5m books and prints (compact `pmc`), Binance and Coinbase trades, Chainlink → `data/ext/crypto/live/`, ~0.25 GB/day in total; pauses under ~6.4 GB free disk (`df` Avail) | `docker logs --tail 3 latency-recorder`; `docker compose stop recorder` |
+| Scheduled task "Latency-arb nightly" | Runs the plan, 00:17 Europe/Zurich | [docs/AUTOPILOT.md](docs/AUTOPILOT.md) |
+
+## Needs the owner
+- **A wallet with $30 for step 4, ideally by 2026-11-17.** The LP wallet can't be used: the LP bot's loss limit and
+  calibration count that whole account, and it has no free cash. Suggested, pending step 3's check: a second
+  Polymarket account funded with $30 through the website, its exported private key in
+  `/root/polymarket-latency-arb/.env.wallet` (`PK=...`, mode 600, gitignored). Step 3 confirms the exact way and
+  pushes one message to the phone.
+- Later, not urgent: this repo has no git remote, so it exists only on this server. And the disk: both projects
+  record onto 8.5 GB free (see `/root/polymarket-bot/docs/STATUS.md`).
 
 ## Layout
 - `research/crypto_updown/`: the study (scripts, `out/` small results, `result.json`). It also holds the other
@@ -28,10 +78,11 @@ small: about $150–600/day at ≤ 100 shares. ETH has no edge left by 500 ms. A
   [pmbt/TAPE_PITFALLS.md](pmbt/TAPE_PITFALLS.md)): executable prices only, today's fees, no look-ahead, clustered
   bootstrap CIs, p < 0.01, sized results; data after 2026-10-04 only for confirmation. Copied from
   `polymarket-bot/parked/pmbt` (the UMA study there still uses its own copy).
-- [CLAUDE.md](CLAUDE.md): rules and background for every session.
+- [CLAUDE.md](CLAUDE.md): rules and background for every session. [docs/LOG.md](docs/LOG.md): history.
+  [docs/AUTOPILOT.md](docs/AUTOPILOT.md): how it runs unattended, and the limits. `scripts/`: phone push, end of session.
 - [POLYMARKET_DATA.md](POLYMARKET_DATA.md): gotchas of Polymarket's historical data.
 - `requirements.txt`: Python packages (copy of the main repo's at the time of parking).
-- `data/` (gitignored): **empty.** The historical data was never on the server and the old forward recordings are lost; re-download history with the
+- `data/` (gitignored): the live recording since 2026-11-15 (`data/ext/crypto/live/`). The historical data was never on the server and the old forward recordings are lost; re-download history with the
   `dl_*.py` / `fetch_gamma*.py` scripts. Scripts find `data/` relative to the project root.
 
 ## Sessions

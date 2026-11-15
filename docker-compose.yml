@@ -1,0 +1,15 @@
+# Uses the LP bot's image `pmbot` (built in /root/polymarket-bot; has python + websockets). Nothing here holds a key.
+services:
+  recorder:                               # research/crypto_updown/live_fwd.py -> data/ext/crypto/live/
+    image: pmbot
+    container_name: latency-recorder
+    command: python -u research/crypto_updown/live_fwd.py --hours 100000 --coins btc --tfs 5m
+    working_dir: /app
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    mem_limit: 300m                       # shared 4 GB server: the LP bot comes first
+    cpus: 0.5
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "2"}

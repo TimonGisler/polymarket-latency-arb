@@ -3,16 +3,23 @@
 
 Streams (every record carries our LOCAL receive time in ms, `r`):
   pm    : Polymarket CLOB market websocket, one connection per BTC/ETH 5m & 15m up/down window
-          (current + next window, discovered via gamma slugs <coin>-updown-<5m|15m>-<start_ts>). Raw messages.
+          (current + next window, discovered via gamma slugs <coin>-updown-<5m|15m>-<start_ts>). Raw messages
+          (only with --raw: ~4 GB/day for BTC 5m alone).
+  pmc   : the same, compact (default, ~0.2 GB/day for BTC 5m). Up token only (Down is its mirror), levels within
+          BAND of the best bid/ask only. ts = server timestamp ms, start = window start (slug suffix). Rows:
+            ["b", r, ts-r, start, [[price,size]..bids], [[price,size]..asks]]      book snapshot
+            ["c", r, ts-r, start, price, size, "B"|"S", best_bid, best_ask]        level change (size = new level size)
+            ["t", r, ts-r, start, is_up_token, price, size, "B"|"S"]               print (taker side, on the token traded)
+            ["s", r, 0, start] / ["e", r, 0, start, err]                           (re)subscribed: book reset / error
   bn    : Binance spot trades via data-stream.binance.vision (btcusdt, ethusdt): [r, T_trade_ms, price, qty, buyer_is_maker]
   cb    : Coinbase Exchange 'matches' BTC-USD / ETH-USD: [r, time_iso, price, size, side]
   cl    : Polymarket RTDS crypto_prices_chainlink (+ crypto_prices): [r, topic, symbol, ts_ms, value]
   meta  : market metadata (slug, condition_id, token ids, start/end) as discovered
 Output: data/ext/crypto/live/<YYYYmmdd_HH>_<stream>.jsonl.gz (hourly files).
-Run:    nohup python3 research/crypto_updown/live_fwd.py --hours 3.5 > data/ext/crypto/live/live_fwd.out 2>&1 &
+Run:    docker compose up -d recorder   (docker-compose.yml: BTC 5m, compact, runs until stopped)
 """
 import os as _os; ROOT = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "../.."))  # project root
-import asyncio, gzip, json, os, sys, time, argparse, subprocess, traceback
+import asyncio, gzip, json, os, shutil, sys, time, argparse, urllib.request
 import websockets
 
 OUT = ROOT + "/data/ext/crypto/live"
@@ -20,6 +27,32 @@ os.makedirs(OUT, exist_ok=True)
 PM_WS = "wss://ws-subscriptions-clob.polymarket.com/ws/market"
 COINS = ["btc", "eth"]
 TFS = {"5m": 300, "15m": 900}
+RAW = False
+BAND = 0.15          # compact mode keeps levels within this of the best bid/ask (replay walks only ask + 2c)
+MIN_FREE_GB = 7.0    # stop writing below this (as Python counts it, ~0.6 GB above `df` Avail): the LP recorder shares the disk and stops at 5 GB
+
+
+def compact(m, r, msg):
+    """raw market-websocket message -> compact rows (see module docstring)"""
+    up = m["tokens"][m["outcomes"].index("Up")]; st = m["start"]
+    d = json.loads(msg)
+    for e in (d if isinstance(d, list) else [d]):
+        t = e.get("event_type"); dt = int(e.get("timestamp") or r) - r
+        if t == "price_change":
+            for c in e["price_changes"]:
+                if c["asset_id"] != up:
+                    continue
+                p = float(c["price"])
+                if float(c["best_bid"]) - BAND <= p <= float(c["best_ask"]) + BAND:
+                    SINK.write("pmc", ["c", r, dt, st, c["price"], c["size"], c["side"][0], c["best_bid"], c["best_ask"]])
+        elif t == "book":
+            if e["asset_id"] != up:
+                continue
+            bb = max([float(l["price"]) for l in e["bids"]] or [0]); ba = min([float(l["price"]) for l in e["asks"]] or [1])
+            SINK.write("pmc", ["b", r, dt, st, [[l["price"], l["size"]] for l in e["bids"] if float(l["price"]) >= bb - BAND],
+                               [[l["price"], l["size"]] for l in e["asks"] if float(l["price"]) <= ba + BAND]])
+        elif t == "last_trade_price":
+            SINK.write("pmc", ["t", r, dt, st, int(e["asset_id"] == up), e["price"], e["size"], e["side"][0]])
 
 
 def now_ms():
@@ -31,8 +64,11 @@ class Sink:
     def __init__(self):
         self.f = {}
         self.n = {}
+        self.full = False   # set by flusher when the disk is nearly full
 
     def write(self, stream, rec):
+        if self.full:
+            return
         key = time.strftime("%Y%m%d_%H", time.gmtime())
         h = self.f.get(stream)
         if h is None or h[0] != key:
@@ -53,8 +89,8 @@ SINK = Sink()
 
 def gamma(slugs):
     url = "https://gamma-api.polymarket.com/markets?limit=50&" + "&".join("slug=" + s for s in slugs)
-    r = subprocess.run(["curl", "-sS", "-m", "20", "-A", "Mozilla/5.0", url], capture_output=True, text=True).stdout
-    return json.loads(r)
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    return json.loads(urllib.request.urlopen(req, timeout=20).read())
 
 
 async def pm_market(m, stop_at):
@@ -64,7 +100,10 @@ async def pm_market(m, stop_at):
         try:
             async with websockets.connect(PM_WS, max_size=2 ** 24, ping_interval=None, open_timeout=15) as ws:
                 await ws.send(json.dumps({"assets_ids": toks, "type": "market"}))
-                SINK.write("pm", {"r": now_ms(), "slug": m["slug"], "sub": toks})
+                if RAW:
+                    SINK.write("pm", {"r": now_ms(), "slug": m["slug"], "sub": toks})
+                else:
+                    SINK.write("pmc", ["s", now_ms(), 0, m["start"]])
                 last_ping = time.time()
                 while time.time() < stop_at:
                     if time.time() - last_ping > 8:
@@ -76,9 +115,15 @@ async def pm_market(m, stop_at):
                     r = now_ms()
                     if msg == "PONG":
                         continue
-                    SINK.write("pm", {"r": r, "slug": m["slug"], "m": msg})
+                    if RAW:
+                        SINK.write("pm", {"r": r, "slug": m["slug"], "m": msg})
+                    else:
+                        compact(m, r, msg)
         except Exception as e:
-            SINK.write("pm", {"r": now_ms(), "slug": m["slug"], "err": repr(e)[:200]})
+            if RAW:
+                SINK.write("pm", {"r": now_ms(), "slug": m["slug"], "err": repr(e)[:200]})
+            else:
+                SINK.write("pmc", ["e", now_ms(), 0, m["start"], repr(e)[:200]])
             await asyncio.sleep(1)
 
 
@@ -112,7 +157,7 @@ async def discovery(stop_all):
 
 
 async def binance(stop_all):
-    url = "wss://data-stream.binance.vision/stream?streams=btcusdt@trade/ethusdt@trade"
+    url = "wss://data-stream.binance.vision/stream?streams=" + "/".join(f"{c}usdt@trade" for c in COINS)
     while time.time() < stop_all:
         try:
             async with websockets.connect(url, max_size=2 ** 22, open_timeout=15) as ws:
@@ -129,7 +174,7 @@ async def coinbase(stop_all):
     while time.time() < stop_all:
         try:
             async with websockets.connect(url, max_size=2 ** 22, open_timeout=15) as ws:
-                await ws.send(json.dumps({"type": "subscribe", "product_ids": ["BTC-USD", "ETH-USD"], "channels": ["matches"]}))
+                await ws.send(json.dumps({"type": "subscribe", "product_ids": [f"{c.upper()}-USD" for c in COINS], "channels": ["matches"]}))
                 while time.time() < stop_all:
                     msg = await asyncio.wait_for(ws.recv(), 30)
                     r = now_ms(); d = json.loads(msg)
@@ -159,7 +204,7 @@ async def rtds(stop_all):
                         continue
                     try:
                         d = json.loads(msg); p = d.get("payload", {})
-                        if p.get("symbol") in ("btc/usd", "eth/usd", "btcusdt", "ethusdt"):
+                        if p.get("symbol") in [f"{c}/usd" for c in COINS] + [f"{c}usdt" for c in COINS]:
                             SINK.write("cl", [r, d.get("topic"), p["symbol"], p.get("timestamp"), p.get("value")])
                     except Exception:
                         pass
@@ -171,8 +216,12 @@ async def flusher(stop_all):
     while time.time() < stop_all:
         await asyncio.sleep(10)
         SINK.flush()
+        free = shutil.disk_usage(OUT).free / 1e9
+        if (free < MIN_FREE_GB) != SINK.full:
+            SINK.full = free < MIN_FREE_GB
+            print(time.strftime("%H:%M:%S"), f"disk free {free:.1f} GB:", "PAUSED, not writing" if SINK.full else "writing again", flush=True)
         if int(time.time()) % 300 < 10:
-            print(time.strftime("%H:%M:%S"), SINK.n, flush=True)
+            print(time.strftime("%m-%d %H:%M:%S"), f"free={free:.1f}GB", SINK.n, flush=True)
 
 
 async def main(hours):
@@ -183,5 +232,8 @@ async def main(hours):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--hours", type=float, default=3.5)
-    a = ap.parse_args()
+    ap.add_argument("--coins", default="btc,eth"); ap.add_argument("--tfs", default="5m,15m")
+    ap.add_argument("--raw", action="store_true", help="store raw Polymarket messages (stream pm) instead of compact rows (pmc)")
+    a = ap.parse_args(); RAW = a.raw
+    COINS[:] = a.coins.split(","); TFS = {k: TFS[k] for k in a.tfs.split(",")}
     asyncio.run(main(a.hours))
