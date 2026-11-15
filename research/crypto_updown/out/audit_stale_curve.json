@@ -1,0 +1,31 @@
+{
+ "T+0ms..+1s": {
+  "share_events_with_stale_fill": 0.793488824101069,
+  "mean_stale_shares": 265.16063332749
+ },
+ "T+150ms..+1s": {
+  "share_events_with_stale_fill": 0.6805150631681244,
+  "mean_stale_shares": 242.14596146311615
+ },
+ "T+300ms..+1s": {
+  "share_events_with_stale_fill": 0.6015549076773566,
+  "mean_stale_shares": 229.0826134556332
+ },
+ "T+550ms..+1s": {
+  "share_events_with_stale_fill": 0.45019436345966957,
+  "mean_stale_shares": 162.41745091633828
+ },
+ "T+1000ms..+1s": {
+  "share_events_with_stale_fill": 0.29397473275024294,
+  "mean_stale_shares": 107.72895847523006
+ },
+ "T+1500ms..+1s": {
+  "share_events_with_stale_fill": 0.24173955296404276,
+  "mean_stale_shares": 102.93035575263595
+ },
+ "T+2500ms..+1s": {
+  "share_events_with_stale_fill": 0.1902332361516035,
+  "mean_stale_shares": 80.334902489647
+ },
+ "n_events": 4116
+}

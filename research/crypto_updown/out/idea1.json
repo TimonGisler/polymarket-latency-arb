@@ -1,0 +1,170 @@
+{
+ "btc": {
+  "ticks": 4704518,
+  "mirrored_share": 0.9999619514687795,
+  "sell_both": {
+   "raw_cross_ticks": 19,
+   "net_positive_ticks": 18,
+   "windows": 4,
+   "episodes": 18,
+   "episodes_lasting_2s_plus": 0,
+   "median_edge_per_share": 0.42981899999999995,
+   "median_size_sh": 31.08,
+   "sum_edge_x_size_usd_if_all_captured": 445.7322978599999
+  },
+  "buy_both": {
+   "raw_cross_ticks": 24,
+   "net_positive_ticks": 23,
+   "windows": 3,
+   "episodes": 23,
+   "episodes_lasting_2s_plus": 0,
+   "median_edge_per_share": 0.429819,
+   "median_size_sh": 35.9,
+   "sum_edge_x_size_usd_if_all_captured": 597.40037606
+  }
+ },
+ "eth": {
+  "ticks": 3677321,
+  "mirrored_share": 0.9996380517229798,
+  "sell_both": {
+   "raw_cross_ticks": 11,
+   "net_positive_ticks": 10,
+   "windows": 5,
+   "episodes": 10,
+   "episodes_lasting_2s_plus": 0,
+   "median_edge_per_share": 0.29536000000000007,
+   "median_size_sh": 11.25,
+   "sum_edge_x_size_usd_if_all_captured": 122.49184694
+  },
+  "buy_both": {
+   "raw_cross_ticks": 13,
+   "net_positive_ticks": 11,
+   "windows": 5,
+   "episodes": 11,
+   "episodes_lasting_2s_plus": 0,
+   "median_edge_per_share": 0.29535999999999996,
+   "median_size_sh": 11.25,
+   "sum_edge_x_size_usd_if_all_captured": 123.12135694
+  }
+ },
+ "sol": {
+  "ticks": 3677622,
+  "mirrored_share": 0.9999779748979096,
+  "sell_both": {
+   "raw_cross_ticks": 161,
+   "net_positive_ticks": 160,
+   "windows": 5,
+   "episodes": 24,
+   "episodes_lasting_2s_plus": 1,
+   "median_edge_per_share": 0.08021499999999987,
+   "median_size_sh": 10.0,
+   "sum_edge_x_size_usd_if_all_captured": 148.61128941999982
+  },
+  "buy_both": {
+   "raw_cross_ticks": 161,
+   "net_positive_ticks": 160,
+   "windows": 5,
+   "episodes": 24,
+   "episodes_lasting_2s_plus": 1,
+   "median_edge_per_share": 0.08021499999999998,
+   "median_size_sh": 10.0,
+   "sum_edge_x_size_usd_if_all_captured": 140.87362702
+  }
+ },
+ "xrp": {
+  "ticks": 3677320,
+  "mirrored_share": 0.9999045500527558,
+  "sell_both": {
+   "raw_cross_ticks": 30,
+   "net_positive_ticks": 29,
+   "windows": 4,
+   "episodes": 22,
+   "episodes_lasting_2s_plus": 4,
+   "median_edge_per_share": 0.45356799999999997,
+   "median_size_sh": 5.49,
+   "sum_edge_x_size_usd_if_all_captured": 83.63888356000001
+  },
+  "buy_both": {
+   "raw_cross_ticks": 30,
+   "net_positive_ticks": 29,
+   "windows": 4,
+   "episodes": 22,
+   "episodes_lasting_2s_plus": 4,
+   "median_edge_per_share": 0.4535679999999999,
+   "median_size_sh": 5.49,
+   "sum_edge_x_size_usd_if_all_captured": 83.63888356000002
+  }
+ },
+ "doge": {
+  "ticks": 3677623,
+  "mirrored_share": 0.9995062027837003,
+  "sell_both": {
+   "raw_cross_ticks": 11,
+   "net_positive_ticks": 11,
+   "windows": 2,
+   "episodes": 9,
+   "episodes_lasting_2s_plus": 2,
+   "median_edge_per_share": 0.36741100000000015,
+   "median_size_sh": 5.89,
+   "sum_edge_x_size_usd_if_all_captured": 24.325295240000006
+  },
+  "buy_both": {
+   "raw_cross_ticks": 11,
+   "net_positive_ticks": 11,
+   "windows": 2,
+   "episodes": 9,
+   "episodes_lasting_2s_plus": 2,
+   "median_edge_per_share": 0.367411,
+   "median_size_sh": 5.89,
+   "sum_edge_x_size_usd_if_all_captured": 24.325295239999996
+  }
+ },
+ "bnb": {
+  "ticks": 3677623,
+  "mirrored_share": 0.999517623203901,
+  "sell_both": {
+   "raw_cross_ticks": 28,
+   "net_positive_ticks": 28,
+   "windows": 3,
+   "episodes": 11,
+   "episodes_lasting_2s_plus": 4,
+   "median_edge_per_share": 0.03693100000000005,
+   "median_size_sh": 5.0,
+   "sum_edge_x_size_usd_if_all_captured": 25.834150680000004
+  },
+  "buy_both": {
+   "raw_cross_ticks": 28,
+   "net_positive_ticks": 28,
+   "windows": 3,
+   "episodes": 11,
+   "episodes_lasting_2s_plus": 4,
+   "median_edge_per_share": 0.036931,
+   "median_size_sh": 5.0,
+   "sum_edge_x_size_usd_if_all_captured": 25.834150679999997
+  }
+ },
+ "hype": {
+  "ticks": 3677319,
+  "mirrored_share": 0.9993557806652075,
+  "sell_both": {
+   "raw_cross_ticks": 29,
+   "net_positive_ticks": 18,
+   "windows": 3,
+   "episodes": 16,
+   "episodes_lasting_2s_plus": 2,
+   "median_edge_per_share": 0.18533749999999996,
+   "median_size_sh": 5.0,
+   "sum_edge_x_size_usd_if_all_captured": 23.596174820000005
+  },
+  "buy_both": {
+   "raw_cross_ticks": 29,
+   "net_positive_ticks": 18,
+   "windows": 3,
+   "episodes": 16,
+   "episodes_lasting_2s_plus": 2,
+   "median_edge_per_share": 0.18533750000000002,
+   "median_size_sh": 5.0,
+   "sum_edge_x_size_usd_if_all_captured": 23.59617482000001
+  }
+ }
+}
