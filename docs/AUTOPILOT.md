@@ -17,7 +17,8 @@ scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: 
    - Broken? Fix it first (`docker compose up -d recorder`), and say what happened in the LOG.
 2. **The next open step** of the [plan](../README.md#plan). One step per night is fine; don't rush money code.
 3. **Write it down:** a dated entry in [LOG.md](LOG.md) (result first, with numbers, negative ones too), update the
-   README ("Where it stands", the plan table, "Needs the owner"), commit.
+   README ("Where it stands", the plan table, "Needs the owner"), commit. The owner reads the status page (`dashboard.py`), which shows those README sections and the newest
+   LOG entry, so keep them short and current; the trader writes `data/trader/summary.json` for it.
 4. **Tell the owner only when needed:** `sh scripts/notify.sh "title" "text"` for something only he can do, and for
    the verdict. Nothing else.
 5. **Last step:** `sh scripts/end_session.sh` (a finished session otherwise keeps ~250 MB of this small server).

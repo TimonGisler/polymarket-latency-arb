@@ -13,3 +13,26 @@ services:
     logging:
       driver: json-file
       options: {max-size: "5m", max-file: "2"}
+
+  dashboard:                              # dashboard.py, read-only; public via the LP bot's caddy (its Caddyfile, last block)
+    image: pmbot
+    container_name: latency-dashboard
+    command: python -u dashboard.py
+    working_dir: /app
+    volumes:
+      - .:/app:ro
+    env_file:                             # the LP dashboard's login (DASHBOARD_USER, DASHBOARD_PASSWORD); not copied here
+      - /root/polymarket-bot/.env
+    ports:
+      - "127.0.0.1:8081:8080"             # on the server: curl -u user:pass localhost:8081
+    networks: [default, lp]               # lp: so the LP bot's caddy can reach it by name
+    restart: unless-stopped
+    mem_limit: 96m
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "2"}
+
+networks:
+  lp:
+    name: polymarket-bot_default
+    external: true

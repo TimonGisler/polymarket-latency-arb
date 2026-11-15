@@ -44,3 +44,11 @@ CLOB" is not simply London.
 pilot. Which wallet is open: [README](../README.md#needs-the-owner).
 
 **This repo has no git remote.** It exists only on this server. Not fixed today (needs the owner to create a GitHub repo).
+
+**Status page built** (`dashboard.py`, container `latency-dashboard`, 15 MB): recorder state from `data/status.json`
+(the recorder now writes it every 10 s), current book and Binance price, Binance lag, disk, hours recorded, then the
+README's "Needs the owner", "Where it stands", "Plan", orders (`data/trader/summary.json`, a flat `{label: value}`
+object the trader should write) and the newest LOG entry. It uses the LP dashboard's login. Works on
+`localhost:8081`; **not public**: that would go through the LP bot's caddy, which this session was not allowed to
+change; it waits for the owner ([README](../README.md#needs-the-owner)).
+The recorder was restarted three times today for these changes (18:25, 18:33, 18:34 UTC; a few seconds missing each).

@@ -19,7 +19,7 @@ Output: data/ext/crypto/live/<YYYYmmdd_HH>_<stream>.jsonl.gz (hourly files).
 Run:    docker compose up -d recorder   (docker-compose.yml: BTC 5m, compact, runs until stopped)
 """
 import os as _os; ROOT = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "../.."))  # project root
-import asyncio, gzip, json, os, shutil, sys, time, argparse, urllib.request
+import asyncio, collections, gzip, json, os, shutil, sys, time, argparse, urllib.request
 import websockets
 
 OUT = ROOT + "/data/ext/crypto/live"
@@ -28,6 +28,7 @@ PM_WS = "wss://ws-subscriptions-clob.polymarket.com/ws/market"
 COINS = ["btc", "eth"]
 TFS = {"5m": 300, "15m": 900}
 RAW = False
+STARTED = int(time.time() * 1000)
 BAND = 0.15          # compact mode keeps levels within this of the best bid/ask (replay walks only ask + 2c)
 MIN_FREE_GB = 7.0    # stop writing below this (as Python counts it, ~0.6 GB above `df` Avail): the LP recorder shares the disk and stops at 5 GB
 
@@ -65,6 +66,8 @@ class Sink:
         self.f = {}
         self.n = {}
         self.full = False   # set by flusher when the disk is nearly full
+        self.last = {}      # stream -> last record (pmc: last level change), for data/status.json
+        self.lag = collections.deque(maxlen=500)   # Binance: our receive time minus trade time, ms
 
     def write(self, stream, rec):
         if self.full:
@@ -78,6 +81,10 @@ class Sink:
             self.f[stream] = h
         h[1].write(json.dumps(rec, separators=(",", ":")) + "\n")
         self.n[stream] = self.n.get(stream, 0) + 1
+        if stream != "pmc" or (rec[0] == "c" and rec[3] * 1000 <= rec[1]):   # pmc: the running window, not the next
+            self.last[stream] = rec
+        if stream == "bn":
+            self.lag.append(rec[0] - rec[2])
 
     def flush(self):
         for _, fh in self.f.values():
@@ -220,6 +227,11 @@ async def flusher(stop_all):
         if (free < MIN_FREE_GB) != SINK.full:
             SINK.full = free < MIN_FREE_GB
             print(time.strftime("%H:%M:%S"), f"disk free {free:.1f} GB:", "PAUSED, not writing" if SINK.full else "writing again", flush=True)
+        st = {"t": now_ms(), "started": STARTED, "free_gb": round(free, 2), "paused": SINK.full, "n": SINK.n, "last": SINK.last,
+              "bn_lag_ms": sorted(SINK.lag)[len(SINK.lag) // 2] if SINK.lag else None}
+        with open(ROOT + "/data/status.json.tmp", "w") as f:    # read by dashboard.py
+            json.dump(st, f)
+        os.replace(ROOT + "/data/status.json.tmp", ROOT + "/data/status.json")
         if int(time.time()) % 300 < 10:
             print(time.strftime("%m-%d %H:%M:%S"), f"free={free:.1f}GB", SINK.n, flush=True)
 
