@@ -58,3 +58,11 @@ The recorder was restarted three times today for these changes (18:25, 18:33, 18
 and a replaced file would not be seen), validated and reloaded, not restarted. Checked: new page 200 with the login and
 401 without, LP dashboard still 200, caddy "Up 7 days". Committed in polymarket-bot. This was a one-off approval;
 other changes to the LP bot still need the owner.
+
+**Wallet received and checked, ~18:45 UTC** (`wallet_check.py`, read-only, no orders). The owner gave a key for a
+separate Polymarket account; it is in `.env.wallet` (root-only, gitignored). API access works. Signer
+`0x372baC7ad43643A69Ea33Fe6Dc22Ad8A4a700607`; cash **$30.00 in the proxy** `0xF82E76a7fDa4Df8ED7D88545B3180B7C20FE45C0`
+(`signature_type=1`, trading allowance set), $0 in the safe and the EOA, 0 open orders. It is an older account, not a
+fresh one: ~100 past trades (2025), a redeem on 2026-10-18, and two resolved losing positions worth $0 that still show
+as "redeemable". So the trader must count only its own trades, not the account's history. The key was pasted in the
+chat, so treat it as a $30 test wallet only; a new key before any larger amount.

@@ -28,6 +28,8 @@ scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: 
 - **Real money:** at most **$30 total loss**, ever, until the owner says otherwise (owner, 2026-11-15). The cap is
   enforced in the trader's code and by the wallet holding no more than that. Orders of the minimum size only.
   More money, a bigger size, or continuing after the $30 is spent: only the owner.
+- **Wallet:** only the one in `.env.wallet` of this repo (README "Needs the owner"). Never print the key, never copy it,
+  load it only into the container that trades or checks. The key was pasted in a chat once: no more money on it than the $30.
 - **Never touch the LP bot:** not its containers, not its files, not its balance. No order may spend the LP pilot's
   money; no session moves money off any wallet. Read `/root/polymarket-bot/docs/INFRA.md#wallet` before wallet work.
 - **Never tune on the forward data.** The test is fixed in the README. Other settings may be reported as extra rows,

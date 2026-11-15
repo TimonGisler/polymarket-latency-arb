@@ -28,8 +28,8 @@ open step ([docs/AUTOPILOT.md](docs/AUTOPILOT.md)). Update the Status column as 
 |---|---|---|---|
 | 1 | Re-check rules, measure latency, start the recorder | 11-15 | **done** ([LOG](docs/LOG.md#2026-11-15)) |
 | 2 | Make `live_replay.py` read the compact `pmc` stream (rebuild the Up book; Down = mirror). Find why 0.42% of rebuilt best prices disagree and count fills that touch a level of unknown size. Run [the test](#the-test-fixed-2026-11-15) on the first day as a dry run of the tooling, not as a result | night to 11-17 | open |
-| 3 | Build `trader.py`: the same rule in real time. Paper mode first (logs each decision, and the book when the order would have landed). Work out the wallet with the least owner work, then ask him for exactly one thing ([Needs the owner](#needs-the-owner)) | night to 11-18 | open |
-| 4 | Real orders at the minimum size (5 shares), $30 total loss cap in code, more than 60 s left in the window. Log for each order: sent, acknowledged, filled or not, fill price, and what the replay predicted for the same event. Needs the funded wallet | from 11-18, as soon as funded | open, waits for the owner |
+| 3 | Build `trader.py`: the same rule in real time. Paper mode first (logs each decision, and the book when the order would have landed). The wallet is ready ([Needs the owner](#needs-the-owner)); work out how winning shares turn back into cash (redeem) so $30 keeps trading | night to 11-18 | open |
+| 4 | Real orders at the minimum size (5 shares), $30 total loss cap in code, more than 60 s left in the window. Log for each order: sent, acknowledged, filled or not, fill price, and what the replay predicted for the same event. Needs the funded wallet | from 11-18 | open (wallet funded 11-15) |
 | 5 | Every night: health check, and one line in the LOG with trades so far and disk free | nightly | open |
 | 6 | Verdict: [the test](#the-test-fixed-2026-11-15) on all recorded days, plus real fills against the replay's prediction. Write it at the top of this file and push it to the owner's phone | 11-21 / 11-22 | open |
 
@@ -64,11 +64,9 @@ extra rows.
 | Scheduled task "Latency-arb nightly" | Runs the plan, 00:17 Europe/Zurich | [docs/AUTOPILOT.md](docs/AUTOPILOT.md) |
 
 ## Needs the owner
-- **A wallet with $30 for step 4, ideally by 2026-11-17.** The LP wallet can't be used: the LP bot's loss limit and
-  calibration count that whole account, and it has no free cash. Suggested, pending step 3's check: a second
-  Polymarket account funded with $30 through the website, its exported private key in
-  `/root/polymarket-latency-arb/.env.wallet` (`PK=...`, mode 600, gitignored). Step 3 confirms the exact way and
-  pushes one message to the phone.
+- Nothing right now. The wallet is there (2026-11-15): key in `/root/polymarket-latency-arb/.env.wallet` (`PK=...`,
+  root-only, gitignored), **$30.00 cash in its Polymarket proxy** `0xF82E76a7fDa4Df8ED7D88545B3180B7C20FE45C0`
+  (`signature_type=1`), no open orders. Check it any time, read-only: see the top of [wallet_check.py](wallet_check.py).
 - Later, not urgent: this repo has no git remote, so it exists only on this server. And the disk: both projects
   record onto 8.5 GB free (see `/root/polymarket-bot/docs/STATUS.md`).
 
