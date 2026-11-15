@@ -67,9 +67,6 @@ extra rows.
 - Nothing right now. The wallet is there (2026-11-15): key in `/root/polymarket-latency-arb/.env.wallet` (`PK=...`,
   root-only, gitignored), **$30.00 cash in its Polymarket proxy** `0xF82E76a7fDa4Df8ED7D88545B3180B7C20FE45C0`
   (`signature_type=1`), no open orders. Check it any time, read-only: see the top of [wallet_check.py](wallet_check.py).
-- **Add the deploy key to GitHub** so the server can push this repo: github.com/TimonGisler/polymarket-latency-arb →
-  Settings → Deploy keys → Add, tick "Allow write access", paste `/root/.ssh/github_deploy_latency.pub` (public part
-  only; the repo uses it via `git config core.sshCommand`). Then any session runs `git push -u origin master`.
 - Later, not urgent: the disk: both projects
   record onto 8.5 GB free (see `/root/polymarket-bot/docs/STATUS.md`).
 

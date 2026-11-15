@@ -74,3 +74,5 @@ chat, so treat it as a $30 test wallet only; a new key before any larger amount.
 here: GitHub deploy keys work for one repository only. A new key `/root/.ssh/github_deploy_latency` was made and this
 repo uses it (`core.sshCommand`, so `~/.ssh/config` is unchanged); the owner has to add its public part as a deploy key
 with write access. Until then pushes fail and the work stays in the local commits.
+
+**Deploy key added by the owner; first push to GitHub done (~19:40 UTC).** Sessions now commit and push.
