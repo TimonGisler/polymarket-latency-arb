@@ -28,7 +28,8 @@ small: about $150–600/day at ≤ 100 shares. ETH has no edge left by 500 ms. A
   [pmbt/TAPE_PITFALLS.md](pmbt/TAPE_PITFALLS.md)): executable prices only, today's fees, no look-ahead, clustered
   bootstrap CIs, p < 0.01, sized results; data after 2026-10-04 only for confirmation. Copied from
   `polymarket-bot/parked/pmbt` (the UMA study there still uses its own copy).
+- [CLAUDE.md](CLAUDE.md): rules and background for every session.
 - [POLYMARKET_DATA.md](POLYMARKET_DATA.md): gotchas of Polymarket's historical data.
 - `requirements.txt`: Python packages (copy of the main repo's at the time of parking).
-- `data/` (gitignored): **empty.** The historical crypto data was never on the server; re-download with the
+- `data/` (gitignored): **empty.** The historical data was never on the server and the old forward recordings are lost; re-download history with the
   `dl_*.py` / `fetch_gamma*.py` scripts. Scripts find `data/` relative to the project root.
