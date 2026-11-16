@@ -7,7 +7,7 @@ Split out of `polymarket-bot` (folder `parked/research/crypto_updown`, phase 1, 
 Nothing here depends on that repo.
 
 ## Where it stands
-Updated 2026-11-15. History: [docs/LOG.md](docs/LOG.md).
+Updated 2026-11-16 (night). History: [docs/LOG.md](docs/LOG.md).
 
 **PROMISING, unconfirmed. A one-week test is running; verdict due 2026-11-22.** History after the bias audit: about
 +3–4% per trade in-sample, +7% out-of-sample. A 3.6 h forward test on 2026-10-13: +9% at ≥ 3 bp, p ≈ 0.1 (not
@@ -19,6 +19,11 @@ have ever been placed.
 - From this server Binance trades arrive ~144 ms late and a CLOB request takes ~53 ms round trip. That is ~130 ms
   slower on the signal than the 10-13 test.
 - The recorder has been running since 2026-11-15 18:22 UTC.
+- **Replay tooling done (11-16).** Dry run on the first 30 h, *not a result*: the fixed test +4.9% ROI on cost
+  (p = 0.004, 964 fills in 254 windows; 11-15 evening +12%, 11-16 +3.6% with p = 0.05 on its own). The book rebuilt
+  from `pmc` is good enough: no fill touched a level of unknown size, 1 of 964 was taken while the rebuilt best
+  disagreed with the server's. Odd: 350 ms execution does no worse than 200 ms, so the edge may be momentum more than
+  speed ([LOG](docs/LOG.md#2026-11-16)).
 
 ## Plan
 The question for 2026-11-22: **is this worth more of the owner's time?** One scheduled session a night does the next
@@ -27,10 +32,10 @@ open step ([docs/AUTOPILOT.md](docs/AUTOPILOT.md)). Update the Status column as 
 | # | Step | Target | Status |
 |---|---|---|---|
 | 1 | Re-check rules, measure latency, start the recorder | 11-15 | **done** ([LOG](docs/LOG.md#2026-11-15)) |
-| 2 | Make `live_replay.py` read the compact `pmc` stream (rebuild the Up book; Down = mirror). Find why 0.42% of rebuilt best prices disagree and count fills that touch a level of unknown size. Run [the test](#the-test-fixed-2026-11-15) on the first day as a dry run of the tooling, not as a result | night to 11-17 | open |
+| 2 | Make `live_replay.py` read the compact `pmc` stream (rebuild the Up book; Down = mirror). Find why 0.42% of rebuilt best prices disagree and count fills that touch a level of unknown size. Run [the test](#the-test-fixed-2026-11-15) on the first day as a dry run of the tooling, not as a result | night to 11-17 | **done 11-16** ([LOG](docs/LOG.md#2026-11-16)) |
 | 3 | Build `trader.py`: the same rule in real time. Paper mode first (logs each decision, and the book when the order would have landed). The wallet is ready ([Needs the owner](#needs-the-owner)); work out how winning shares turn back into cash (redeem) so $30 keeps trading | night to 11-18 | open |
 | 4 | Real orders at the minimum size (5 shares), $30 total loss cap in code, more than 60 s left in the window. Log for each order: sent, acknowledged, filled or not, fill price, and what the replay predicted for the same event. Needs the funded wallet | from 11-18 | open (wallet funded 11-15) |
-| 5 | Every night: health check, and one line in the LOG with trades so far and disk free | nightly | open |
+| 5 | Every night: health check; replay the finished days (`live_replay.py` with no arguments, ~10 min a day, in the `pmbot` image: command at the top of the script); one line in the LOG with the test so far, trades so far and disk free | nightly | open |
 | 6 | Verdict: [the test](#the-test-fixed-2026-11-15) on all recorded days, plus real fills against the replay's prediction. Write it at the top of this file and push it to the owner's phone. Done by the task "Latency-arb verdict" | **Sun 11-22 08:30 Zurich; on the phone by 12:00 at the latest** | open |
 
 **What the real orders are for.** $30 buys roughly 200–400 minimum-size trades (the fee alone is ~8c per trade). That
@@ -67,8 +72,7 @@ extra rows.
 - Nothing right now. The wallet is there (2026-11-15): key in `/root/polymarket-latency-arb/.env.wallet` (`PK=...`,
   root-only, gitignored), **$30.00 cash in its Polymarket proxy** `0xF82E76a7fDa4Df8ED7D88545B3180B7C20FE45C0`
   (`signature_type=1`), no open orders. Check it any time, read-only: see the top of [wallet_check.py](wallet_check.py).
-- Later, not urgent: the disk: both projects
-  record onto 8.5 GB free (see `/root/polymarket-bot/docs/STATUS.md`).
+- Later, not urgent: the disk (20.5 GB free on 2026-11-16, up from 8.5 GB; this recorder uses ~0.35 GB/day).
 
 ## Layout
 - `research/crypto_updown/`: the study (scripts, `out/` small results, `result.json`). It also holds the other

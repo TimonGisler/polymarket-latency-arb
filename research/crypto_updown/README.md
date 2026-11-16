@@ -171,6 +171,10 @@ should require τ > 60 s.
 $2.5–3k/day at a 100-share cap, but the CI includes 0. The next step is a multi-day recording, BTC/ETH 5m+15m only, at about 300 MB/h
 raw. Compact the book deltas first, then re-run `live_replay.py` unchanged.
 
+*2026-11-16:* `live_replay.py` now reads only the compact `pmc` stream and runs exactly the fixed test of the top-level
+README (BTC 5m, Binance ≥ 3 bp, 250 ms, > 60 s left) plus its sensitivity rows. The raw-format version above is in git
+history (commit 368053e and earlier). Results: the top-level README and `docs/LOG.md`.
+
 ## Other details
 
 * **#19 (5m) table**, P(Up) and opening mid by previous streak. Streak = +k means k Ups in a row.

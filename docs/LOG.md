@@ -103,3 +103,37 @@ done from the server session `bot-server-home`, ~21:45–22:05 UTC).
 - **The nightly task of 23:17 UTC failed within a second: "You've hit your session limit · resets 12:30am (UTC)"**
   (the owner's shared Claude limit). No plan step was done that night. The LP bot's operator tick at 22:07 failed the
   same way. Both left their Claude process behind (~190 MB each).
+
+## 2026-11-16 (nightly session, ~23:17–23:55 UTC)
+**Plan step 2 done: `live_replay.py` reads `pmc` and runs exactly the fixed test. Dry run on the first 30 h
+(11-15 18:22 → 11-16 ~23:40), not a result:** TEST +4.9% ROI on cost, 95% CI [+1.0, +9.0]%, one-sided p = 0.004,
+964 fills in 254 windows, avg 86 shares at 0.55, PnL +$2,284 on $47k cost (≈ $1.8k/day at a 100-share cap, before any
+real-world fill shortfall). Per day: 11-15 evening +12.4% (112 fills), 11-16 +3.6% (852 fills; p = 0.05 alone).
+
+| row (sensitivity rows are not the verdict) | fills | ROI | p |
+|---|---|---|---|
+| TEST: Binance ≥ 3 bp, 250 ms | 964 | +4.9% | 0.004 |
+| exec 200 ms | 1023 | +5.1% | 0.007 |
+| exec 350 ms | 867 | +5.8% | 0.004 |
+| ≥ 5 bp | 229 | +3.6% | 0.13 |
+| Coinbase ≥ 3 bp | 1182 | +5.9% | 0.002 |
+
+- Of 1,170 decisions, 206 found nothing at or below the limit (no fill); fills averaged 0.75c above the decision ask.
+  1,026 signals came with ≤ 60 s left, 329 with no ask on the side.
+- **Worth flagging:** 350 ms is no worse than 200 ms (the 10-13 test showed the same: +500 ms as good as 0). If that holds
+  over the week, the edge is more short-term momentum than a race, and a closer server would not help. It also means the
+  real-order step can still work with our ~144 ms Binance lag.
+- **Book rebuild from `pmc`:** the 0.42% of 11-15 was a per-row count while a message is half applied. Compared after
+  each whole message, the rebuilt best bid/ask disagrees with the server's on 0.066% of 30.5M live-window messages
+  (11-16); 97% of those are "phantom" levels (we still hold a level the server's best says is gone), only 2% fall outside
+  the known 15c band, and the next snapshot (~6/s, one after every trade) clears them: snapshots disagree with the
+  rebuilt best 131 times in 450k. **Fills touching a level of unknown size: 0 of 964. Fills taken while the rebuilt
+  best disagreed: 1.** The band is not a problem.
+- Replay is per UTC day (`data/replay/<day>.parquet`, ~9.5 min and < 1 GB per full day in the `pmbot` image); with no
+  arguments it does every finished day not yet replayed whole, then the report. AUTOPILOT now has the nightly replay as
+  its step 2, so Sunday's verdict only needs the last day plus the report. 11-16 was replayed before it ended and will
+  be redone by the next night automatically.
+- Health 23:17 UTC: recorder up 25 h, every counter rising (pmc 44.3M, bn 4.64M, cb 2.14M, cl 181k); the Chainlink
+  watchdog reconnected once at ~23:03. Disk 20.5 GB free (was 8.5 GB on 11-15; freed outside this project), recording
+  441 MB so far. No restart, nothing to repair. Trades: none (no real orders yet).
+- The nightly run of 11-15 failed on the Claude usage limit (entry above); this run did the step it missed.

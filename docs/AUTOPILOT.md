@@ -22,13 +22,17 @@ scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: 
    - `df -h /`: if under 7 GB free, compress old hours harder (`xz`) or delete what the replay no longer needs; never
      touch `/root/polymarket-bot`.
    - Broken? Fix it first (`docker compose up -d recorder`), and say what happened in the LOG.
-2. **The next open step** of the [plan](../README.md#plan). One step per night is fine; don't rush money code.
-3. **Write it down:** a dated entry in [LOG.md](LOG.md) (result first, with numbers, negative ones too), update the
+2. **Replay the finished days**, every night: `docker run --rm -m 1g --cpus 1 -v $PWD:/app -w /app pmbot python -u
+   research/crypto_updown/live_replay.py` (no arguments: only days not yet replayed whole, ~10 min each, then the report
+   over all of them into `research/crypto_updown/out/live_replay.json`). Check `free -m` first. Read the TEST row only;
+   never change the test because of it.
+3. **The next open step** of the [plan](../README.md#plan). One step per night is fine; don't rush money code.
+4. **Write it down:** a dated entry in [LOG.md](LOG.md) (result first, with numbers, negative ones too), update the
    README ("Where it stands", the plan table, "Needs the owner"), commit and `git push`. The owner reads the status page (`dashboard.py`), which shows those README sections and the newest
    LOG entry, so keep them short and current; the trader writes `data/trader/summary.json` for it.
-4. **Tell the owner only when needed:** `sh scripts/notify.sh "title" "text"` for something only he can do, and for
+5. **Tell the owner only when needed:** `sh scripts/notify.sh "title" "text"` for something only he can do, and for
    the verdict. Nothing else.
-5. **Last step:** `sh scripts/end_session.sh` (a finished session otherwise keeps ~250 MB of this small server).
+6. **Last step:** `sh scripts/end_session.sh` (a finished session otherwise keeps ~250 MB of this small server).
    Never in a session a person is using.
 
 ## Limits
