@@ -19,7 +19,7 @@ Output: data/ext/crypto/live/<YYYYmmdd_HH>_<stream>.jsonl.gz (hourly files).
 Run:    docker compose up -d recorder   (docker-compose.yml: BTC 5m, compact, runs until stopped)
 """
 import os as _os; ROOT = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "../.."))  # project root
-import asyncio, collections, gzip, json, os, shutil, sys, time, argparse, urllib.request
+import asyncio, collections, gzip, json, os, shutil, signal, sys, time, argparse, urllib.request
 import websockets
 
 OUT = ROOT + "/data/ext/crypto/live"
@@ -30,6 +30,7 @@ TFS = {"5m": 300, "15m": 900}
 RAW = False
 STARTED = int(time.time() * 1000)
 BAND = 0.15          # compact mode keeps levels within this of the best bid/ask (replay walks only ask + 2c)
+RTDS_STALE_S = 30    # Chainlink/RTDS prices come about twice a second; this long without one = reconnect (LOG 2026-11-15)
 MIN_FREE_GB = 7.0    # stop writing below this (as Python counts it, ~0.6 GB above `df` Avail): the LP recorder shares the disk and stops at 5 GB
 
 
@@ -89,6 +90,11 @@ class Sink:
     def flush(self):
         for _, fh in self.f.values():
             fh.flush()
+
+    def close_and_exit(self):
+        for _, fh in self.f.values():
+            fh.close()
+        os._exit(0)
 
 
 SINK = Sink()
@@ -198,8 +204,10 @@ async def rtds(stop_all):
     while time.time() < stop_all:
         try:
             async with websockets.connect(url, max_size=2 ** 22, open_timeout=15, ping_interval=None) as ws:
-                await ws.send(json.dumps(sub)); last = time.time()
+                await ws.send(json.dumps(sub)); last = last_data = time.time()
                 while time.time() < stop_all:
+                    if time.time() - last_data > RTDS_STALE_S:   # the feed goes silent with the socket still open
+                        raise TimeoutError(f"no price for {RTDS_STALE_S} s, reconnecting")
                     if time.time() - last > 5:
                         await ws.send("PING"); last = time.time()
                     try:
@@ -213,6 +221,7 @@ async def rtds(stop_all):
                         d = json.loads(msg); p = d.get("payload", {})
                         if p.get("symbol") in [f"{c}/usd" for c in COINS] + [f"{c}usdt" for c in COINS]:
                             SINK.write("cl", [r, d.get("topic"), p["symbol"], p.get("timestamp"), p.get("value")])
+                            last_data = time.time()
                     except Exception:
                         pass
         except Exception as e:
@@ -238,6 +247,9 @@ async def flusher(stop_all):
 
 async def main(hours):
     stop_all = time.time() + hours * 3600
+    # `docker stop` / `restart` send SIGTERM: end the gzip files properly. A killed process leaves them without an end,
+    # and what the next start appends to the same hour file is then unreadable until scripts/fix_gz.py (LOG 2026-11-15).
+    asyncio.get_running_loop().add_signal_handler(signal.SIGTERM, SINK.close_and_exit)
     await asyncio.gather(discovery(stop_all), binance(stop_all), coinbase(stop_all), rtds(stop_all), flusher(stop_all))
     SINK.flush()
 

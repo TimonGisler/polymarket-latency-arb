@@ -76,3 +76,30 @@ repo uses it (`core.sshCommand`, so `~/.ssh/config` is unchanged); the owner has
 with write access. Until then pushes fail and the work stays in the local commits.
 
 **Deploy key added by the owner; first push to GitHub done (~19:40 UTC).** Sessions now commit and push.
+
+**Chainlink stream had stopped; recorder fixed; restart damage in the files found and repaired** (owner's request,
+done from the server session `bot-server-home`, ~21:45–22:05 UTC).
+- **Chainlink (`cl`) gaps:** no prices from about 20:15 to 20:32 and from 20:55 to 21:46 UTC. The RTDS socket stays
+  open and answers, but the feed goes silent; the recorder only reconnected when the server closed the socket
+  (20:32, "Going away"). A fresh connection gets prices at once (16 in 8 s). Fix: `RTDS_STALE_S` in `live_fwd.py`,
+  30 s without a price = reconnect. The other streams had no gap. The health check in AUTOPILOT did not look at `cl`.
+- **Restarts made hour files unreadable.** A killed recorder leaves a gzip member without its end, the next start
+  appends to the same hour file, and `gzip`/`zcat` stop at the junction. Hour 18 had 4 such parts (the starts of
+  18:22–18:33): a normal reader saw 37,122 of 560,636 `pmc` lines. Nothing was lost on disk except up to 10 s before
+  each kill. `scripts/fix_gz.py` rewrites such files as clean gzip (originals in `data/ext/crypto/live_damaged/`,
+  6.5 MB, delete when the replay has read the repaired files). Hour 18 repaired: `bn` 49,714, `cb` 109,065, `cl` 4,369,
+  `pmc` 560,636 lines.
+- **Clean shutdown:** `live_fwd.py` now closes its files on SIGTERM (`docker stop`, `restart`). Tested in a throwaway
+  copy: 30 s of recording, `docker stop`, all five files pass `gzip -t`. An OOM kill or crash still needs `fix_gz.py`.
+- Recorder restarted 21:46 and 21:49 UTC for these two changes: two gaps of about 15 s in all streams, and hour 21
+  got two more junctions (the 21:46 one was a kill); repaired with `fix_gz.py` after 22:00.
+
+## 2026-11-16
+**Check 08:00 UTC (server session `bot-server-home`): recorder healthy; the nightly session did not run.**
+- Hour 21 of 11-15 repaired at 22:01 (`pmc` 891,059, `bn` 128,694, `cb` 175,102, `cl` 1,609 lines); all 75 finished
+  files pass `gzip -t`. 182 MB recorded so far.
+- Since the fix (11-15 22:00 → 11-16 08:00): no gap over 30 s in `pmc` and `bn`; `cl` two gaps of 33 s (02:05, 05:16),
+  both the new watchdog reconnecting after the feed went silent. It works.
+- **The nightly task of 23:17 UTC failed within a second: "You've hit your session limit · resets 12:30am (UTC)"**
+  (the owner's shared Claude limit). No plan step was done that night. The LP bot's operator tick at 22:07 failed the
+  same way. Both left their Claude process behind (~190 MB each).

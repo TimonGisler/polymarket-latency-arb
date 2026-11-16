@@ -17,7 +17,8 @@ scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: 
 ## A session's job
 1. **Health, always** (2 minutes):
    - `docker ps --filter name=latency-recorder` is Up, `docker logs --tail 3 latency-recorder` shows a line from the
-     last 10 minutes and no `PAUSED` (it pauses itself when the disk runs low); today's `data/ext/crypto/live/*_pmc.jsonl.gz` files grow.
+     last 10 minutes and no `PAUSED` (it pauses itself when the disk runs low); today's `data/ext/crypto/live/*_pmc.jsonl.gz` files grow, and in the log's 5-minute lines every counter rises, `cl` (Chainlink) too.
+   - After any recorder restart or crash: `python3 scripts/fix_gz.py` once the hour has ended (a kill leaves hour files that normal readers can only read in part).
    - `df -h /`: if under 7 GB free, compress old hours harder (`xz`) or delete what the replay no longer needs; never
      touch `/root/polymarket-bot`.
    - Broken? Fix it first (`docker compose up -d recorder`), and say what happened in the LOG.
