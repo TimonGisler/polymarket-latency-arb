@@ -14,7 +14,7 @@ services:
       driver: json-file
       options: {max-size: "5m", max-file: "2"}
 
-  dashboard:                              # dashboard.py, read-only; public via the LP bot's caddy (its Caddyfile, last block)
+  latency-dashboard:                      # dashboard.py, read-only; public via the LP bot's caddy (its Caddyfile, last block)
     image: pmbot
     container_name: latency-dashboard
     command: python -u dashboard.py
