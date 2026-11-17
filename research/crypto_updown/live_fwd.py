@@ -31,6 +31,7 @@ RAW = False
 STARTED = int(time.time() * 1000)
 BAND = 0.15          # compact mode keeps levels within this of the best bid/ask (replay walks only ask + 2c)
 RTDS_STALE_S = 30    # Chainlink/RTDS prices come about twice a second; this long without one = reconnect (LOG 2026-11-15)
+MEM_MAX_MB = 200     # resident + swapped; it grows ~9 MB/h (leak not found, LOG 2026-11-17): above this, exit cleanly and let docker restart it
 MIN_FREE_GB = 7.0    # stop writing below this (as Python counts it, ~0.6 GB above `df` Avail): the LP recorder shares the disk and stops at 5 GB
 
 
@@ -55,6 +56,15 @@ def compact(m, r, msg):
                                [[l["price"], l["size"]] for l in e["asks"] if float(l["price"]) <= ba + BAND]])
         elif t == "last_trade_price":
             SINK.write("pmc", ["t", r, dt, st, int(e["asset_id"] == up), e["price"], e["size"], e["side"][0]])
+
+
+def mem_mb():
+    """this process's resident + swapped memory, MB"""
+    try:
+        kv = dict(l.split(":", 1) for l in open("/proc/self/status"))
+        return sum(int(kv.get(k, "0 kB").split()[0]) for k in ("VmRSS", "VmSwap")) / 1024
+    except Exception:
+        return 0.0
 
 
 def now_ms():
@@ -241,6 +251,10 @@ async def flusher(stop_all):
         with open(ROOT + "/data/status.json.tmp", "w") as f:    # read by dashboard.py
             json.dump(st, f)
         os.replace(ROOT + "/data/status.json.tmp", ROOT + "/data/status.json")
+        mem = mem_mb()
+        if mem > MEM_MAX_MB and 240 <= time.time() % 300 < 290:   # last 60 s of a 5m window: the test makes no decisions then
+            print(time.strftime("%m-%d %H:%M:%S"), f"memory {mem:.0f} MB > {MEM_MAX_MB}: clean exit, docker restarts", flush=True)
+            SINK.close_and_exit()
         if int(time.time()) % 300 < 10:
             print(time.strftime("%m-%d %H:%M:%S"), f"free={free:.1f}GB", SINK.n, flush=True)
 

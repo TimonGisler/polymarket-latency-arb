@@ -137,3 +137,41 @@ real-world fill shortfall). Per day: 11-15 evening +12.4% (112 fills), 11-16 +3.
   watchdog reconnected once at ~23:03. Disk 20.5 GB free (was 8.5 GB on 11-15; freed outside this project), recording
   441 MB so far. No restart, nothing to repair. Trades: none (no real orders yet).
 - The nightly run of 11-15 failed on the Claude usage limit (entry above); this run did the step it missed.
+
+## 2026-11-17 (nightly session, ~23:17–23:45 UTC)
+**Plan step 3 done (paper part): `trader.py` runs the fixed rule in real time, paper mode, as container
+`latency-trader` since 23:24 UTC. Replay with 11-16 now complete: TEST +4.7% ROI, p = 0.012, 970 fills, both days
+positive; p is no longer below 0.01 (the partial 11-16 had given 0.004). Recorder had a memory leak; fixed with a clean
+self-restart.**
+
+| row (30 h, 11-15 18:22 → 11-16 24:00; sensitivity rows are not the verdict) | fills | ROI | p |
+|---|---|---|---|
+| TEST: Binance ≥ 3 bp, 250 ms | 970 | +4.7% [+0.6, +9.0] | 0.012 |
+| exec 200 ms | 1033 | +5.0% | 0.005 |
+| exec 350 ms | 872 | +5.7% | 0.004 |
+| ≥ 5 bp | 230 | +2.9% | 0.20 |
+| Coinbase ≥ 3 bp | 1190 | +5.7% | 0.000 |
+
+- Per day (TEST): 11-15 evening +12.4% (112 fills), 11-16 +3.5% (858). PnL +$2,230 on $47.3k cost at ≤ 100 shares.
+  Still 350 ms ≥ 200 ms. 11-17 gets replayed by the next night (only finished UTC days).
+- **`trader.py` (paper):** own Binance and Polymarket websockets, the same rule as `live_replay.py` (1 s lookback in
+  exchange time, 3 bp, 5 s cooldown, > 60 s left, ask + 2c, Down = 1 − Up bids). Logs each decision with the top 5 levels,
+  and 250 ms later the book again with the paper fill at ≤ 100 shares and at the 5-share size step 4 will send;
+  settles on gamma. Output `data/trader/decisions.jsonl`, `data/trader/summary.json` (on the dashboard). Executions land
+  0–3 ms after the 250 ms mark; Binance lag 135 ms median; 30 MB memory. Checked against the recorder: the first signal's
+  Binance trade is in the recording too (trader received it 12 ms before the recorder). Its counters and unsettled paper
+  fills start fresh on restart (paper only; step 4's loss cap must persist).
+  Seen at once: the book often moves in those 250 ms (one fill: ask 0.89 → 0.91, 4.4 of 100 shares).
+- **Redeem (for step 4):** as the LP bot's merger does (`/root/polymarket-bot/bot/positions.py`, read only): the
+  `polymarket` SDK in the `pmbot` image, `SecureClient.create(private_key=PK, wallet=<proxy>)`, once
+  `create_builder_api_key()` (store in this repo's `.env.builder`, gitignored), then
+  `redeem_positions(condition_id=...).wait()`: gasless via the relayer, works for a proxy wallet (`signature_type=1`),
+  redeems tested for real by the LP bot on 11-04. Trader: redeem each won window a few minutes after it resolves.
+  To check in step 4: a 5-share buy below 0.20 is under $1; whether the CLOB has a $1 minimum for marketable orders.
+- **Recorder memory leak:** 295 MB resident + 133 MB in swap after 49 h (started at ~28 MB, ≈ 9 MB/h), pinned at its
+  300 MB cap and swapping (cgroup `max` events 1.86M, no OOM kill yet). Swapping can delay our receive timestamps and
+  eats the server's shared swap. Leak not found. Fix: `live_fwd.py` exits cleanly (files closed) when resident + swap
+  > 200 MB, only in the last 60 s of a 5m window (no decisions then); docker restarts it in ~1 s. Expect a restart
+  about every 20 h. Restarted once by hand at 23:29:05 (second 245 of the window): ~1 s gap, all streams back.
+- Health 23:18 UTC: recorder up 2 days, every counter rising (pmc 80.3M, bn 9.24M, cb 3.88M, cl 351k), 19.9 GB free.
+  Trades: none (paper only).
