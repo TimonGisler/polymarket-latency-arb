@@ -175,3 +175,53 @@ self-restart.**
   about every 20 h. Restarted once by hand at 23:29:05 (second 245 of the window): ~1 s gap, all streams back.
 - Health 23:18 UTC: recorder up 2 days, every counter rising (pmc 80.3M, bn 9.24M, cb 3.88M, cl 351k), 19.9 GB free.
   Trades: none (paper only).
+
+## 2026-11-18 (nightly session, 23:17–23:50 UTC)
+**Plan step 4 started: real 5-share orders run since 23:27 UTC (`trader.py --live`, $30 loss cap). Replay over 3 days
+(54 h): TEST +5.4% ROI on cost, 95% CI [+2.5, +8.3]%, p < 0.001, 1,895 fills, all 3 days positive. Paper trader's first
+full day: +4.8% on 680 fills. Not a verdict yet (needs ≥ 5 days and the real fills).**
+
+| row (54 h, 11-15 18:22 → 11-17 24:00; sensitivity rows are not the verdict) | fills | ROI | p |
+|---|---|---|---|
+| TEST: Binance ≥ 3 bp, 250 ms | 1895 | +5.4% [+2.5, +8.3] | < 0.001 |
+| exec 200 ms | 1994 | +5.7% | < 0.001 |
+| exec 350 ms | 1681 | +5.6% | < 0.001 |
+| ≥ 5 bp | 494 | +6.8% | 0.001 |
+| Coinbase ≥ 3 bp | 2318 | +4.1% | 0.003 |
+
+- Per day (TEST): 11-15 evening +12.4% (112 fills), 11-16 +3.5% (858), 11-17 +6.1% (925). PnL +$4.7k on $88k cost at
+  ≤ 100 shares (≈ $2.1k/day before any real-world fill shortfall). 350 ms still as good as 200 ms.
+- **Paper trader (11-17 23:24 → 11-18 23:17):** 832 decisions, 680 paper fills, 151 nothing at the limit; settled
+  +$1,479 on $30.8k (+4.8%) at ≤ 100 shares, +4.7% at 5 shares; win rate 56.8%; Binance lag 145 ms median.
+- **Trader memory leak:** at 128 MB cap + 65 MB swap after 24 h (cgroup `max` events 144k), and 22 Polymarket
+  disconnects "1013 slow consumer: send buffer full" (it was too slow to read the socket). Same leak as the recorder
+  (both use per-window `websockets` connections; not found). Fix as in the recorder: clean exit above 100 MB in the
+  last minute of a window; the trader now rebuilds its counters, unsettled fills and the real-money ledger from
+  `decisions.jsonl` on start (checked: the rebuilt totals equal the running ones to the cent).
+- **Real orders (step 4), what was built:** on each decision, a FAK buy of 5 shares at ask + 2c (the paper limit) is
+  signed and posted at decision time in a worker thread; the answer is logged as `ev: "order"` next to the paper
+  `exec` of the same id (the replay's prediction for that event). Loss cap: $ paid (incl. fee) for all real fills minus
+  $ won on settled ones; open positions count as lost; no order once that plus the next order would pass $30. Winners
+  are redeemed every 5 min (data-api `redeemable` → `polymarket` SDK `redeem_positions`, as the LP bot does; key in
+  `.env.builder`). Wallet cash is read every minute (dashboard).
+- **What the first orders showed:** one manual test order at 23:25 (5 Up @ 0.46 filled, $2.30 + fee $0.08694 =
+  5 × 0.07 × 0.46 × 0.54: **the fee is charged in cash on top, exactly the test's formula**; gamma's `feeSchedule` still
+  says rate 0.07, exponent 1, taker only). Then in the first minutes: 4 filled (Down at limits 0.94–0.99; fill prices
+  equal to the paper's 250 ms fill), 2 killed "no orders found to match" (nothing left at the limit; the paper had
+  filled one of them at 0.59), 1 rejected: **the CLOB refuses marketable buys under $1**, so 5 shares need a limit
+  ≥ 0.20 (now skipped and counted). Exchange answer 350–530 ms after sending; signing took 15 ms warm, 36–50 ms at the
+  container's 0.5 CPU, so the trader now has 1 CPU. FAK fills can be a bit over 5 shares (5.05).
+- **First comparison, 23:27–23:47 (14 orders with a limit ≥ 0.20): paper 5-share fill at 250 ms 13 of 14, real fill
+  8 of 14; where both filled, the same price.** If real orders keep missing that often, our orders land later than the
+  test's 250 ms (answers came 350–1400 ms after sending; the CLOB's match time has only 1 s resolution) and the
+  replay's profit has to be cut by the real fill rate. Too few orders yet; the verdict will have a few hundred.
+- Settlement: **Polymarket redeemed the resolved winners itself** within minutes (positions gone, cash back: 7 fills,
+  2 lost, cash $29.03 at 23:40). The trader's own redeem (fallback) had read data-api v1 keys, which v2 doesn't send;
+  fixed, and found nothing to redeem. Ledger at 23:48: $36.1 paid, $25.3 won, settled PnL −$0.97, cap use $10.75/30.
+- Still seen after the restart: Polymarket "slow consumer" disconnects (1 in 20 min) with low memory, so not only
+  swapping: probably `get_json` (gamma, blocking, up to 20 s) inside the event loop in discovery/settle. Not fixed
+  tonight; a candidate for the next session (move those calls to a thread).
+- Health 23:17 UTC: recorder up 8 h (its memory self-restart at 15:14 worked, ~1 s gap; nothing to repair:
+  `fix_gz.py` found no damaged file), every counter rising; Chainlink watchdog reconnects now and then as before.
+  Disk 18 GB free. Trader up, summary current.
+

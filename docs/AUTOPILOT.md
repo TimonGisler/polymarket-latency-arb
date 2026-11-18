@@ -20,6 +20,10 @@ scheduled-task tools (`list_triggers`, `update_trigger`). Its prompt only says: 
      last 10 minutes and no `PAUSED` (it pauses itself when the disk runs low); today's `data/ext/crypto/live/*_pmc.jsonl.gz` files grow, and in the log's 5-minute lines every counter rises, `cl` (Chainlink) too.
    - `latency-trader` is Up and `data/trader/summary.json` was updated in the last minute. The recorder restarting
      itself about once a day (log line `memory ... clean exit`) is expected (LOG 2026-11-17).
+   - Real orders (since 2026-11-18): in `summary.json`, "real net loss vs cap" stays under 30 and "wallet cash" matches
+     roughly $30 − loss. Compare real with paper on the same order ids in `decisions.jsonl` (`ev` "order" vs the
+     5-share fill of `ev` "exec"): fill rate and price; that comparison is half of the verdict. The trader itself
+     stops ordering at the cap; never raise it.
    - After any recorder restart or crash: `python3 scripts/fix_gz.py` once the hour has ended (a kill leaves hour files that normal readers can only read in part).
    - `df -h /`: if under 7 GB free, compress old hours harder (`xz`) or delete what the replay no longer needs; never
      touch `/root/polymarket-bot`.

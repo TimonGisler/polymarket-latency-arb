@@ -1,145 +1,146 @@
 {
  "replayed": [
   "20261115",
-  "20261116"
+  "20261116",
+  "20261117"
  ],
- "pmc_hour_files": 30,
- "n_resolved_windows": 323,
+ "pmc_hour_files": 54,
+ "n_resolved_windows": 580,
  "rows": [
   {
    "variant": "TEST",
-   "decisions": 1183,
+   "decisions": 2290,
    "unresolved": 0,
-   "no_fill": 213,
-   "fills": 970,
+   "no_fill": 395,
+   "fills": 1895,
    "fills_unknown_level": 0,
-   "fills_book_disagreed": 1,
-   "roi": 0.047117581941446496,
+   "fills_book_disagreed": 2,
+   "roi": 0.05371191571796984,
    "roi_ci95": [
-    0.005759842684497323,
-    0.09020221181516339
+    0.02476906735439252,
+    0.08291142118747953
    ],
-   "p_one_sided": 0.012,
-   "pnl": 2229.826085711979,
-   "cost": 47324.71391428802,
-   "windows": 258,
-   "days": 2,
-   "days_positive": 2,
-   "avg_shares": 85.80543298969071,
-   "avg_price": 0.5519593632451442,
-   "avg_fee": 0.8108722621525998,
-   "win_rate": 0.5896907216494846,
-   "exec_minus_decision_ask": 0.007470703451329719,
-   "fills_per_hour": 32.333333333333336,
-   "pnl_per_day": 1783.860868569583
+   "p_one_sided": 0.0,
+   "pnl": 4736.97191075218,
+   "cost": 88192.19808924782,
+   "windows": 458,
+   "days": 3,
+   "days_positive": 3,
+   "avg_shares": 85.14886015831135,
+   "avg_price": 0.5343595112336579,
+   "avg_fee": 0.7965429864104594,
+   "win_rate": 0.5773087071240105,
+   "exec_minus_decision_ask": 0.007386951866903359,
+   "fills_per_hour": 35.092592592592595,
+   "pnl_per_day": 2105.3208492231906
   },
   {
    "variant": "sens exec 200 ms",
-   "decisions": 1183,
+   "decisions": 2290,
    "unresolved": 0,
-   "no_fill": 150,
-   "fills": 1033,
+   "no_fill": 296,
+   "fills": 1994,
    "fills_unknown_level": 0,
    "fills_book_disagreed": 0,
-   "roi": 0.05006972083655713,
+   "roi": 0.056750409878332755,
    "roi_ci95": [
-    0.009792623086412515,
-    0.09056635053628599
+    0.025953841684734653,
+    0.08725143520860346
    ],
-   "p_one_sided": 0.005,
-   "pnl": 2518.9944160494106,
-   "cost": 50309.73558395059,
-   "windows": 266,
-   "days": 2,
-   "days_positive": 2,
-   "avg_shares": 85.93418199419168,
-   "avg_price": 0.549667038638267,
-   "avg_fee": 0.8330694907556535,
-   "win_rate": 0.5856727976766699,
-   "exec_minus_decision_ask": 0.007378558483378363,
-   "fills_per_hour": 34.43333333333333,
-   "pnl_per_day": 2015.1955328395284
+   "p_one_sided": 0.0,
+   "pnl": 5320.0308079315355,
+   "cost": 93744.35919206846,
+   "windows": 471,
+   "days": 3,
+   "days_positive": 3,
+   "avg_shares": 86.18394182547641,
+   "avg_price": 0.5327722848428452,
+   "avg_fee": 0.8261071675368429,
+   "win_rate": 0.5737211634904714,
+   "exec_minus_decision_ask": 0.0071438996873788825,
+   "fills_per_hour": 36.925925925925924,
+   "pnl_per_day": 2364.45813685846
   },
   {
    "variant": "sens exec 350 ms",
-   "decisions": 1183,
+   "decisions": 2290,
    "unresolved": 0,
-   "no_fill": 311,
-   "fills": 872,
+   "no_fill": 609,
+   "fills": 1681,
    "fills_unknown_level": 0,
    "fills_book_disagreed": 0,
-   "roi": 0.056636829006787286,
+   "roi": 0.056167161295732924,
    "roi_ci95": [
-    0.014045642010485406,
-    0.10228248374930227
+    0.026159476203702188,
+    0.0889262665909176
    ],
-   "p_one_sided": 0.0035,
-   "pnl": 2352.057960843553,
-   "cost": 41528.77203915645,
-   "windows": 251,
-   "days": 2,
-   "days_positive": 2,
-   "avg_shares": 83.67755733944955,
-   "avg_price": 0.5588381412523841,
-   "avg_fee": 0.7552528660051009,
-   "win_rate": 0.5928899082568807,
-   "exec_minus_decision_ask": 0.008283095380824558,
-   "fills_per_hour": 29.066666666666666,
-   "pnl_per_day": 1881.646368674842
+   "p_one_sided": 0.0,
+   "pnl": 4324.684150028974,
+   "cost": 76996.66584997103,
+   "windows": 434,
+   "days": 3,
+   "days_positive": 3,
+   "avg_shares": 84.132748364069,
+   "avg_price": 0.5355281158188704,
+   "avg_fee": 0.745799958340885,
+   "win_rate": 0.5728732897085068,
+   "exec_minus_decision_ask": 0.007971304397097695,
+   "fills_per_hour": 31.12962962962963,
+   "pnl_per_day": 1922.081844457322
   },
   {
    "variant": "sens 5 bp",
-   "decisions": 285,
+   "decisions": 600,
    "unresolved": 0,
-   "no_fill": 55,
-   "fills": 230,
+   "no_fill": 106,
+   "fills": 494,
    "fills_unknown_level": 0,
    "fills_book_disagreed": 0,
-   "roi": 0.028924203098834117,
+   "roi": 0.06797633723471772,
    "roi_ci95": [
-    -0.037961040071955936,
-    0.09440981387260891
+    0.023737805484442633,
+    0.11812291035302169
    ],
-   "p_one_sided": 0.1965,
-   "pnl": 333.3387502137704,
-   "cost": 11524.56124978623,
-   "windows": 102,
-   "days": 2,
-   "days_positive": 2,
-   "avg_shares": 87.23152173913043,
-   "avg_price": 0.5643862716178939,
-   "avg_fee": 0.7756493468966511,
-   "win_rate": 0.5869565217391305,
-   "exec_minus_decision_ask": 0.007377575965720072,
-   "fills_per_hour": 7.666666666666667,
-   "pnl_per_day": 266.6710001710163
+   "p_one_sided": 0.001,
+   "pnl": 1695.9389874452463,
+   "cost": 24948.96101255475,
+   "windows": 206,
+   "days": 3,
+   "days_positive": 3,
+   "avg_shares": 86.34317813765182,
+   "avg_price": 0.5683991219928758,
+   "avg_fee": 0.7732035476816876,
+   "win_rate": 0.6153846153846154,
+   "exec_minus_decision_ask": 0.0067938588349810685,
+   "fills_per_hour": 9.148148148148149,
+   "pnl_per_day": 753.7506610867762
   },
   {
    "variant": "sens Coinbase",
-   "decisions": 1478,
+   "decisions": 2823,
    "unresolved": 0,
-   "no_fill": 288,
-   "fills": 1190,
+   "no_fill": 505,
+   "fills": 2318,
    "fills_unknown_level": 0,
    "fills_book_disagreed": 1,
-   "roi": 0.05741917281764855,
+   "roi": 0.040972926242669266,
    "roi_ci95": [
-    0.02171916000413872,
-    0.09245515665736428
+    0.014077917633609062,
+    0.06974451979006197
    ],
-   "p_one_sided": 0.0,
-   "pnl": 3353.4610753888414,
-   "cost": 58403.15892461116,
-   "windows": 290,
-   "days": 2,
-   "days_positive": 2,
-   "avg_shares": 86.07419327731093,
-   "avg_price": 0.5523134595375503,
-   "avg_fee": 0.8140112223623186,
-   "win_rate": 0.5907563025210084,
-   "exec_minus_decision_ask": 0.007363039369483116,
-   "fills_per_hour": 39.666666666666664,
-   "pnl_per_day": 2682.7688603110732
+   "p_one_sided": 0.0025,
+   "pnl": 4399.299967635102,
+   "cost": 107370.9000323649,
+   "windows": 513,
+   "days": 3,
+   "days_positive": 3,
+   "avg_shares": 85.41933132010354,
+   "avg_price": 0.5304145115902597,
+   "avg_fee": 0.7949404496828731,
+   "win_rate": 0.5616911130284729,
+   "exec_minus_decision_ask": 0.007032716939698783,
+   "fills_per_hour": 42.925925925925924,
+   "pnl_per_day": 1955.244430060045
   }
  ],
  "per_day": {
@@ -155,6 +156,12 @@
     "pnl": 1408.5878,
     "cost": 40725.1622,
     "roi": 0.0346
+   },
+   "2026-11-17": {
+    "n": 925,
+    "pnl": 2507.1458,
+    "cost": 40867.4842,
+    "roi": 0.0613
    }
   },
   "sens exec 200 ms": {
@@ -169,6 +176,12 @@
     "pnl": 1704.9587,
     "cost": 43387.2713,
     "roi": 0.0393
+   },
+   "2026-11-17": {
+    "n": 961,
+    "pnl": 2801.0364,
+    "cost": 43434.6236,
+    "roi": 0.0645
    }
   },
   "sens exec 350 ms": {
@@ -183,6 +196,12 @@
     "pnl": 1673.4025,
     "cost": 35493.8275,
     "roi": 0.0471
+   },
+   "2026-11-17": {
+    "n": 809,
+    "pnl": 1972.6262,
+    "cost": 35467.8938,
+    "roi": 0.0556
    }
   },
   "sens 5 bp": {
@@ -197,6 +216,12 @@
     "pnl": 89.9521,
     "cost": 9798.4879,
     "roi": 0.0092
+   },
+   "2026-11-17": {
+    "n": 264,
+    "pnl": 1362.6002,
+    "cost": 13424.3998,
+    "roi": 0.1015
    }
   },
   "sens Coinbase": {
@@ -211,6 +236,12 @@
     "pnl": 2281.5932,
     "cost": 49679.4368,
     "roi": 0.0459
+   },
+   "2026-11-17": {
+    "n": 1128,
+    "pnl": 1045.8389,
+    "cost": 48967.7411,
+    "roi": 0.0214
    }
   }
  },
@@ -275,6 +306,40 @@
    "decisions_skipped": {
     "<=60 s left": 1055,
     "no ask": 339
+   },
+   "pm_ws_lag_ms_median": 23.0
+  },
+  "20261117": {
+   "pmc_hour_files": 24,
+   "complete": true,
+   "book_diag": {
+    "rows_c": 34999374,
+    "msg_nobook": 230,
+    "rows_c_mismatch": 92294,
+    "msg_live": 25562188,
+    "snap_live": 430520,
+    "msg_live_mismatch": 23116,
+    "msg_live_ask_phantom": 11149,
+    "resubscribe": 339,
+    "msg_other": 2633473,
+    "msg_live_bid_phantom": 10971,
+    "msg_live_mismatch_outside_known": 423,
+    "msg_other_mismatch": 988,
+    "msg_other_bid_phantom": 522,
+    "msg_other_ask_phantom": 455,
+    "snap_live_best_differs": 169,
+    "msg_live_bid_missing": 454,
+    "msg_live_ask_missing": 542,
+    "ws_error": 49,
+    "ws_error_live": 34,
+    "msg_other_ask_missing": 5,
+    "msg_other_bid_missing": 6,
+    "msg_other_mismatch_outside_known": 79
+   },
+   "decisions_skipped": {
+    "<=60 s left": 1056,
+    "no book": 1,
+    "no ask": 309
    },
    "pm_ws_lag_ms_median": 23.0
   }
