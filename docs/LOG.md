@@ -234,3 +234,7 @@ full day: +4.8% on 680 fills. Not a verdict yet (needs ≥ 5 days and the real f
   far; it is the number the verdict hinges on.
 - Dashboard: new section "How the real money is doing" at the top: one sentence (real PnL, fill rate real vs paper on
   the same signals) and a chart of cumulative real vs paper $ over time, read from `data/trader/decisions.jsonl`.
+- Is the +$6.26 real? Bootstrap on the 48 settled real fills: ROI +3.1%, 95% CI [−4.9, +10.2]%, p ≈ 0.20: **noise
+  so far**. Win rate 88% (mostly buys at 0.9+). Paper ROI on the same signals, split by what really happened: orders
+  that filled +4.9% (n=47), orders that were killed **+11.3%** (n=105, p ≈ 0.04). Early sign of adverse selection: we
+  lose the race on the best signals (price ran away) and get filled on the weaker ones. Not significant yet; watch it.
