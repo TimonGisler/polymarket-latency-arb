@@ -238,3 +238,14 @@ full day: +4.8% on 680 fills. Not a verdict yet (needs ≥ 5 days and the real f
   so far**. Win rate 88% (mostly buys at 0.9+). Paper ROI on the same signals, split by what really happened: orders
   that filled +4.9% (n=47), orders that were killed **+11.3%** (n=105, p ≈ 0.04). Early sign of adverse selection: we
   lose the race on the best signals (price ran away) and get filled on the weaker ones. Not significant yet; watch it.
+- **Why real orders fill less than paper** (`research/crypto_updown/fill_check.py`, result in `out/fill_check.json`):
+  for the 192 real orders so far, rebuilt the recorded book and asked whether 5 shares at the order's limit were there.
+  Paper fill rate falls with the delay: +0 ms 97%, +250 ms 83% (what paper/replay assume), +500 ms 62%, +1000 ms 38%,
+  +2000 ms 23%. **At the moment Polymarket answered us (sent + ack_ms) it is 26% and matches the real outcome for
+  190 of 192 orders.** So the real fill is decided by the book ~0.3–2.5 s after sending (median ~0.8 s), not at 250 ms.
+  Fill rate by answer time: < 400 ms 65%, 400–700 ms 28%, 700–1200 ms 18%, > 1200 ms 11%.
+- Where that time goes: our signing is 12–34 ms; Polymarket's Cloudflare edge is 3 ms away (TCP connect), a rejected
+  POST /order takes ~90 ms in total, and the SDK keeps one HTTP/2 connection. The rest, ~0.3–2 s, is inside Polymarket
+  (150 ms taker delay + queue/matching). **Neither Rust nor a closer server touches that**; at most ~50 ms of ~800.
+- Consequence: the replay's 250 ms assumption is too optimistic for us. The verdict should judge the replay's edge at
+  ~1 s (sensitivity row) together with the real fills, not the 250 ms TEST row alone.

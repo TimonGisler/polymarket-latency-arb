@@ -1,0 +1,94 @@
+{
+ "orders": 192,
+ "real_fill_rate": 0.25,
+ "rows": [
+  {
+   "book_at": "+0 ms",
+   "n": 192,
+   "paper_fill": 0.974,
+   "agree": 0.276,
+   "paper_yes_real_no": 139,
+   "paper_no_real_yes": 0
+  },
+  {
+   "book_at": "+100 ms",
+   "n": 192,
+   "paper_fill": 0.932,
+   "agree": 0.318,
+   "paper_yes_real_no": 131,
+   "paper_no_real_yes": 0
+  },
+  {
+   "book_at": "+250 ms",
+   "n": 192,
+   "paper_fill": 0.833,
+   "agree": 0.417,
+   "paper_yes_real_no": 112,
+   "paper_no_real_yes": 0
+  },
+  {
+   "book_at": "+500 ms",
+   "n": 192,
+   "paper_fill": 0.62,
+   "agree": 0.599,
+   "paper_yes_real_no": 74,
+   "paper_no_real_yes": 3
+  },
+  {
+   "book_at": "+750 ms",
+   "n": 192,
+   "paper_fill": 0.458,
+   "agree": 0.74,
+   "paper_yes_real_no": 45,
+   "paper_no_real_yes": 5
+  },
+  {
+   "book_at": "+1000 ms",
+   "n": 192,
+   "paper_fill": 0.375,
+   "agree": 0.812,
+   "paper_yes_real_no": 30,
+   "paper_no_real_yes": 6
+  },
+  {
+   "book_at": "+1500 ms",
+   "n": 192,
+   "paper_fill": 0.297,
+   "agree": 0.849,
+   "paper_yes_real_no": 19,
+   "paper_no_real_yes": 10
+  },
+  {
+   "book_at": "+2000 ms",
+   "n": 192,
+   "paper_fill": 0.229,
+   "agree": 0.865,
+   "paper_yes_real_no": 11,
+   "paper_no_real_yes": 15
+  },
+  {
+   "book_at": "+3000 ms",
+   "n": 192,
+   "paper_fill": 0.198,
+   "agree": 0.865,
+   "paper_yes_real_no": 8,
+   "paper_no_real_yes": 18
+  },
+  {
+   "book_at": "half-way to answer",
+   "n": 192,
+   "paper_fill": 0.719,
+   "agree": 0.531,
+   "paper_yes_real_no": 90,
+   "paper_no_real_yes": 0
+  },
+  {
+   "book_at": "at answer",
+   "n": 192,
+   "paper_fill": 0.255,
+   "agree": 0.995,
+   "paper_yes_real_no": 1,
+   "paper_no_real_yes": 0
+  }
+ ]
+}

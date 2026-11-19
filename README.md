@@ -27,6 +27,9 @@ significant). It's a speed race, and capacity is small: about $150–600/day at 
   to judge yet, but this is the number the verdict hinges on. Polymarket redeems winners by itself; cash $19–29.
   **After ~8 h (11-19 07:13): real +$6.26 on 47 fills (+3.1%), but only 26% of 178 real orders filled vs 85% on
   paper for the same signals** (paper would have made +$46.76). Live chart on the dashboard.
+  **Why:** Polymarket answers our orders only ~0.8 s (median) after we send them; the book at that moment predicts
+  the real outcome for 190 of 192 orders (`fill_check.py`). The delay is on Polymarket's side (taker delay + matching), so
+  neither Rust nor a closer server would fix it ([LOG](docs/LOG.md#2026-11-19-owner-session-0715-utc)).
 - The recorder runs since 2026-11-15 18:22 UTC. It leaks memory (~9 MB/h); since 11-17 it restarts itself cleanly
   above 200 MB, in the last minute of a window (~1 s gap, about every 20 h).
 
