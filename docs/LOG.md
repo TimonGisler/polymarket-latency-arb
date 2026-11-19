@@ -225,3 +225,12 @@ full day: +4.8% on 680 fills. Not a verdict yet (needs ≥ 5 days and the real f
   `fix_gz.py` found no damaged file), every counter rising; Chainlink watchdog reconnects now and then as before.
   Disk 18 GB free. Trader up, summary current.
 
+
+## 2026-11-19 (owner session, ~07:15 UTC)
+- First ~8 h of real orders (11-18 23:26 → 11-19 07:13): **real PnL +$6.26 on 47 settled 5-share fills (+3.1% on
+  $200 spent)**; wallet cash $31.30 (started $30). **But only 47 of 178 real orders filled (26%)**; the paper trader
+  would have filled 152 (85%) of the same signals and made +$46.76. The rest were FAK-killed: nothing left at
+  ask + 2c by the time the order arrived (ack median 845 ms). Fill rate is clearly worse than the replay assumes so
+  far; it is the number the verdict hinges on.
+- Dashboard: new section "How the real money is doing" at the top: one sentence (real PnL, fill rate real vs paper on
+  the same signals) and a chart of cumulative real vs paper $ over time, read from `data/trader/decisions.jsonl`.

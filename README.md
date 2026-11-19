@@ -25,6 +25,8 @@ significant). It's a speed race, and capacity is small: about $150–600/day at 
   **First ~25 min: of 14 orders the paper (250 ms) would have filled 13, real ones filled 8**; the rest were killed
   (nothing left at the limit). Where both filled, the price was the same. Answer ~350–1400 ms after sending. Too few
   to judge yet, but this is the number the verdict hinges on. Polymarket redeems winners by itself; cash $19–29.
+  **After ~8 h (11-19 07:13): real +$6.26 on 47 fills (+3.1%), but only 26% of 178 real orders filled vs 85% on
+  paper for the same signals** (paper would have made +$46.76). Live chart on the dashboard.
 - The recorder runs since 2026-11-15 18:22 UTC. It leaks memory (~9 MB/h); since 11-17 it restarts itself cleanly
   above 200 MB, in the last minute of a window (~1 s gap, about every 20 h).
 
