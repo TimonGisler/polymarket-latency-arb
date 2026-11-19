@@ -249,3 +249,39 @@ full day: +4.8% on 680 fills. Not a verdict yet (needs ≥ 5 days and the real f
   (150 ms taker delay + queue/matching). **Neither Rust nor a closer server touches that**; at most ~50 ms of ~800.
 - Consequence: the replay's 250 ms assumption is too optimistic for us. The verdict should judge the replay's edge at
   ~1 s (sensitivity row) together with the real fills, not the 250 ms TEST row alone.
+
+## 2026-11-19 (nightly session, 23:17–00:30 UTC)
+**Replay over 4 days (11-15 18:22 → 11-18 end, 78 h): TEST +5.4% ROI, 95% CI [+2.9, +8.1]%, p < 0.001, 2,606 fills, 4
+of 4 days positive. But the edge shrinks with execution delay, and real orders are now losing: real PnL −$12.08 on 208
+fills (ROI −1.2%, CI [−10, +6]%), only 29% of 717 real orders filled vs 80% on paper for the same signals.**
+
+| row (78 h; sensitivity rows are not the verdict) | fills | ROI [95% CI] | p |
+|---|---|---|---|
+| TEST: Binance ≥ 3 bp, 250 ms | 2606 | +5.4% [+2.9, +8.1] | < 0.001 |
+| exec 200 ms | 2750 | +5.7% | < 0.001 |
+| exec 350 ms | 2299 | +5.5% | < 0.001 |
+| **exec 500 ms (new)** | 1921 | +4.5% [+1.7, +7.5] | < 0.001 |
+| **exec 1000 ms (new)** | 1404 | +2.2% [−0.8, +5.3] | 0.09 |
+| ≥ 5 bp | 659 | +6.3% | 0.001 |
+| Coinbase ≥ 3 bp | 3271 | +4.5% | < 0.001 |
+
+- Per day (TEST): 11-15 evening +12.4%, 11-16 +3.5%, 11-17 +6.1%, **11-18 +5.3% (711 fills)**. At 1000 ms: +5.7%,
+  +2.1%, +3.0%, +0.6%. The first three days replayed again with the two new rows give exactly the old numbers.
+- New rows (added to `live_replay.py` tonight, marked as sensitivity, the TEST is unchanged): real orders are answered
+  ~0.5–1 s after sending and the book at that moment decides the real fill (owner session this morning). At 1 s
+  delay the replay keeps about 40% of the TEST's profit and is no longer significant.
+- **Real orders (11-18 23:26 → 11-19 23:14, 717 orders):** real fills 208 (29%), paper 5-share fills at 250 ms 577
+  (80%). Where both filled (206), the same price 116 times; real paid on average 0.5c/share more (fee included).
+  Settled real: −$9.69 on $802 (ROI −1.2%, 95% CI [−10.0, +6.1]%, p ≈ 0.58); summary.json: −$12.08 incl. open
+  positions, cap use 12.08/30, wallet cash $17.92 (= $30 − 12.08, matches). Paper on the same 577 signals: +4.4%
+  (p ≈ 0.05). **Adverse selection is now clear:** paper ROI on the signals that really filled −0.8% (n=206), on those
+  that were killed +8.1% (n=369, p ≈ 0.01). We get filled only when the price did not run away, i.e. on the trades
+  without edge. Since the owner's check at 07:13 real PnL went from +$6.26 to −$12.08.
+- At this pace (~−$1/h since this morning) the trader reaches its $30 cap around 11-20 afternoon and stops itself,
+  as designed. That's fine: ~700 real orders already answer the fill question for the verdict.
+- Health 23:17 UTC: recorder up (its memory self-restarts now come every ~8 h: 00:19, 08:04, 15:59; was ~20 h),
+  every counter rising, `fix_gz.py` found nothing to fix. Trader up, restarted itself at 23:14 (100 MB), state
+  rebuilt from the log (1,886 decisions, 7 open fills); paper since 11-17: 1,563 fills, +3.3% (100 sh), +3.9% (5 sh).
+  Disk 18 GB free.
+- For the verdict on 11-22: the TEST row will most likely pass the replay half of the rule; the real-order half is
+  failing (fill rate 29% vs 80%, and the fills we get are the ones without edge).

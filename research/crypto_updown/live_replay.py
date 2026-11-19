@@ -7,7 +7,7 @@ Buy the side the move favours: marketable limit at (best ask seen at r) + 2c, at
 depth of the book as we see it locally at r + 250 ms (150 ms taker delay + 100 ms round trip/compute; local receive time
 throughout, so no clock sync with Polymarket is needed). Fee shares*0.07*p*(1-p); settled on the official gamma outcome.
 ROI on cost incl. fees, bootstrap clustered by window, one-sided p, per-day ROI.
-Sensitivity rows (never the verdict): execution at 200 / 350 ms, threshold 5 bp, Coinbase as the signal.
+Sensitivity rows (never the verdict): execution at 200 / 350 / 500 / 1000 ms, threshold 5 bp, Coinbase as the signal.
 
 Book: Up token only (Down = 1 - Up bids). 'b' replaces the book, 'c' sets one level, 's' (re)subscribe clears it until the
 next 'b'. Levels further than 15c from the best bid/ask are not recorded, so a price is "known" only inside
@@ -38,7 +38,9 @@ SLIP = 0.02            # limit = decision ask + 2c
 COOLDOWN = 5000        # ms, exchange time
 # (name, signal source, threshold bp, ms from our receipt of the trade to the book state we fill against)
 VARIANTS = [("TEST", "bn", 3, 250), ("sens exec 200 ms", "bn", 3, 200), ("sens exec 350 ms", "bn", 3, 350),
-            ("sens 5 bp", "bn", 5, 250), ("sens Coinbase", "cb", 3, 250)]
+            ("sens 5 bp", "bn", 5, 250), ("sens Coinbase", "cb", 3, 250),
+            # added 2026-11-19: real orders are answered ~0.5-1 s after sending (fill_check.py); still never the verdict
+            ("sens exec 500 ms", "bn", 3, 500), ("sens exec 1000 ms", "bn", 3, 1000)]
 
 
 def files(stream, days):
