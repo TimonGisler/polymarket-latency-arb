@@ -285,3 +285,38 @@ fills (ROI −1.2%, CI [−10, +6]%), only 29% of 717 real orders filled vs 80% 
   Disk 18 GB free.
 - For the verdict on 11-22: the TEST row will most likely pass the replay half of the rule; the real-order half is
   failing (fill rate 29% vs 80%, and the fills we get are the ones without edge).
+
+## 2026-11-20 (nightly session, 23:17–23:50 UTC)
+**Real orders stopped at the $30 cap on 11-20 06:02 UTC: real −$21.45 on 244 settled fills (ROI −2.3%, 95% CI
+[−10.6, +4.5]%), 27% of 889 orders filled vs 81% on paper. The paper made +5.2% on the same signals (p ≈ 0.02),
+but only on the orders that were killed: +9.7% (n=479, p ≈ 0.001), versus −1.6% on the ones that really filled (n=242).
+Replay over 5 days (102 h): TEST +4.5%, 95% CI [+2.4, +6.6]%, p < 0.001, 3,461 fills, 5 of 5 days positive; but 11-19
+alone +1.8%, and at 1000 ms delay +1.5% (p ≈ 0.13), 11-19 −0.7%.**
+
+| row (102 h; sensitivity rows are not the verdict) | fills | ROI [95% CI] | p |
+|---|---|---|---|
+| TEST: Binance ≥ 3 bp, 250 ms | 3461 | +4.5% [+2.4, +6.6] | < 0.001 |
+| exec 200 ms | 3653 | +4.9% | < 0.001 |
+| exec 350 ms | 3062 | +4.1% | < 0.001 |
+| exec 500 ms | 2560 | +3.3% [+0.9, +5.7] | 0.003 |
+| exec 1000 ms | 1863 | +1.5% [−1.1, +4.0] | 0.13 |
+| ≥ 5 bp | 866 | +6.2% | < 0.001 |
+| Coinbase ≥ 3 bp | 4543 | +4.2% | < 0.001 |
+
+- TEST per day: 11-15 evening +12.4%, 11-16 +3.5%, 11-17 +6.1%, 11-18 +5.3%, **11-19 +1.8% (855 fills)**. At
+  1000 ms: +5.7%, +2.1%, +3.0%, +0.6%, −0.7%. 11-20 is not finished at this hour; the Sunday night run adds it
+  (then ~126 h, over the 5 days the verdict rule needs).
+- New `research/crypto_updown/real_vs_paper.py` (stdlib, seconds; → `out/real_vs_paper.json`): joins every real
+  order with the paper 5-share fill and the outcome by decision id. The verdict session only has to run it. Result
+  above; where both filled (242) real paid 0.5c/share more than paper. Per day real / paper: 11-19 −$11.44 / +$62.19,
+  11-20 (until 06:02) −$11.85 / +$37.85.
+- The cap: the trader counts $29.09 of 30 (it counts open positions and 2 orders with unknown answer as lost) and has
+  skipped real orders since 11-20 06:02; paper continues. The last two orders got HTTP 503 "trading is disabled" (a
+  Polymarket pause), so they did not fill. Wallet cash $6.08, so the real loss is ~$23.9. Nothing to do: it stops by
+  design, and the remaining $6 stays on the wallet (no session moves money).
+- Health 23:17 UTC: recorder up (memory self-restarts 01:44, 09:49, 16:59; `fix_gz.py` found nothing), every counter
+  rising, `cl` too. Trader up (self-restart 23:04, state rebuilt, 4,224 decisions); paper since 11-17: 3,618 settled,
+  +2.3% (100 sh), +3.5% (5 sh). Disk 17 GB free. The trader logs `Could not create api key` (400) on start, then works
+  (the key exists already; derive is used).
+- For the verdict: the replay half passes at 250 ms but fades to nothing at the ~0.8 s our orders really take; the
+  real-order half fails clearly (fill rate 27% vs 81%, and only the edgeless signals fill).
