@@ -7,10 +7,10 @@ Split out of `polymarket-bot` (folder `parked/research/crypto_updown`, phase 1, 
 Nothing here depends on that repo.
 
 ## Where it stands
-Updated 2026-11-20 (night). History: [docs/LOG.md](docs/LOG.md).
+Updated 2026-11-21 (night). History: [docs/LOG.md](docs/LOG.md).
 
-**The replay passes, real orders failed. Verdict due 2026-11-22.** Replay over 5 days (102 h): +4.5%, p < 0.001, but
-only +1.5% (p ≈ 0.13) at the ~1 s our orders really take. Real money stopped at the $30 cap on 11-20 06:02: −$21.45 on
+**The replay passes, real orders failed. Verdict due 2026-11-22.** Replay over 6 days (126 h): +3.3%, p < 0.001, 6/6
+days positive but falling (11-20 +1.3%), and only +0.6% (p ≈ 0.26) at the ~1 s our orders really take. Real money stopped at the $30 cap on 11-20 06:02: −$21.45 on
 244 fills (loss ~$23.9 by wallet cash), only 27% of 889 orders filled (paper 81%), and the paper edge sits entirely in the
 orders that were killed (+9.7%) while the filled ones made −1.6% ([LOG](docs/LOG.md#2026-11-20-nightly-session-2317-2350-utc)).
 History after the bias audit: about
@@ -20,10 +20,10 @@ significant). It's a speed race, and capacity is small: about $150–600/day at 
 
 - Rules today are the ones the forward test ran under (150 ms taker delay, 0.07 fee, 60 s TWAP; checked 11-15).
 - From this server Binance trades arrive ~135–144 ms late and a CLOB request takes ~53 ms round trip.
-- **Replay so far (11-15 18:22 → 11-19 end, 102 h; the verdict needs ≥ 5 days, 11-20 is added Sunday night):** the
-  fixed test **+4.5% ROI on cost, 95% CI [+2.4, +6.6]%, p < 0.001**, 3,461 fills, 5 of 5 days positive (11-19 only
-  +1.8%). Slower execution (sensitivity rows): 500 ms +3.3% (p ≈ 0.003), **1000 ms +1.5%, p ≈ 0.13** (11-19 −0.7%):
-  the edge fades at the delay our real orders actually have.
+- **Replay so far (11-15 18:22 → 11-20 end, 126 h):** the fixed test **+3.3% ROI on cost, 95% CI [+1.6, +5.0]%,
+  p < 0.001**, 5,517 fills, 6 of 6 days positive (11-19 +1.8%, 11-20 +1.3%). Slower execution (sensitivity rows):
+  500 ms +2.1% (p ≈ 0.02), **1000 ms +0.6%, p ≈ 0.26** (11-19 and 11-20 −0.7% each): the edge fades at the delay
+  our real orders actually have ([LOG](docs/LOG.md#2026-11-21-nightly-session-2317-2350-utc-prepares-the-verdict)).
 - **Paper trader, first full day (11-17 23:24 → 11-18 23:17):** 680 settled paper fills, +4.8% ROI (100 sh), +4.7% at
   5 shares, win rate 57%: the same picture as the replay, live.
 - **Real orders since 2026-11-18 23:27 UTC** (`trader.py --live`, 5 shares, FAK at ask + 2c, $30 loss cap in code).
@@ -53,7 +53,7 @@ open step ([docs/AUTOPILOT.md](docs/AUTOPILOT.md)). Update the Status column as 
 | 2 | Make `live_replay.py` read the compact `pmc` stream (rebuild the Up book; Down = mirror). Find why 0.42% of rebuilt best prices disagree and count fills that touch a level of unknown size. Run [the test](#the-test-fixed-2026-11-15) on the first day as a dry run of the tooling, not as a result | night to 11-17 | **done 11-16** ([LOG](docs/LOG.md#2026-11-16)) |
 | 3 | Build `trader.py`: the same rule in real time. Paper mode first (logs each decision, and the book when the order would have landed). The wallet is ready ([Needs the owner](#needs-the-owner)); work out how winning shares turn back into cash (redeem) so $30 keep trading | night to 11-18 | **done 11-17**: paper mode runs; redeem = `polymarket` SDK `redeem_positions`, gasless ([LOG](docs/LOG.md#2026-11-17-nightly-session-2317-2345-utc)) |
 | 4 | Real orders at the minimum size (5 shares), $30 total loss cap in code, more than 60 s left in the window. Log for each order: sent, acknowledged, filled or not, fill price, and what the replay predicted for the same event. Needs the funded wallet | from 11-18 | **done 11-20 06:02** ($30 cap reached): real −$21.45 on 244 fills, fill rate 27% vs paper 81%; compare with `real_vs_paper.py` ([LOG](docs/LOG.md#2026-11-20-nightly-session-2317-2350-utc)) |
-| 5 | Every night: health check; replay the finished days (`live_replay.py` with no arguments, ~10 min a day, in the `pmbot` image: command at the top of the script); one line in the LOG with the test so far, trades so far and disk free | nightly | running (11-20: 5 days replayed, +4.5%, p < 0.001; 1000 ms +1.5%, p ≈ 0.13) |
+| 5 | Every night: health check; replay the finished days (`live_replay.py` with no arguments, ~10 min a day, in the `pmbot` image: command at the top of the script); one line in the LOG with the test so far, trades so far and disk free | nightly | running (11-21: 6 days replayed, +3.3%, p < 0.001; 1000 ms +0.6%, p ≈ 0.26; ready for the verdict) |
 | 6 | Verdict: [the test](#the-test-fixed-2026-11-15) on all recorded days, plus real fills against the replay's prediction. Write it at the top of this file and push it to the owner's phone. Done by the task "Latency-arb verdict" | **Sun 11-22 08:30 Zurich; on the phone by 12:00 at the latest** | open |
 
 **What the real orders are for.** $30 buys roughly 200–400 minimum-size trades (the fee alone is ~8c per trade). That

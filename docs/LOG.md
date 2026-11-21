@@ -320,3 +320,36 @@ alone +1.8%, and at 1000 ms delay +1.5% (p ≈ 0.13), 11-19 −0.7%.**
   (the key exists already; derive is used).
 - For the verdict: the replay half passes at 250 ms but fades to nothing at the ~0.8 s our orders really take; the
   real-order half fails clearly (fill rate 27% vs 81%, and only the edgeless signals fill).
+
+## 2026-11-21 (nightly session, 23:17–23:50 UTC; prepares the verdict)
+**Replay over 6 days (11-15 18:22 → 11-20 end, 126 h): TEST +3.3% ROI, 95% CI [+1.6, +5.0]%, p < 0.001, 5,517 fills,
+6 of 6 days positive. But the per-day ROI keeps falling (11-19 +1.8%, 11-20 +1.3%), and at 1000 ms (what our real
+orders take) it's +0.6%, p ≈ 0.26, negative on both of the last two days. Real orders: unchanged since the cap
+(11-20 06:02): −$21.45 on 244 fills, fill rate 27% vs paper 81%.**
+
+| row (126 h; sensitivity rows are not the verdict) | fills | ROI [95% CI] | p |
+|---|---|---|---|
+| TEST: Binance ≥ 3 bp, 250 ms | 5517 | +3.3% [+1.6, +5.0] | < 0.001 |
+| exec 200 ms | 5771 | +3.8% | < 0.001 |
+| exec 350 ms | 4982 | +3.0% | < 0.001 |
+| exec 500 ms | 4295 | +2.1% [+0.2, +3.9] | 0.016 |
+| exec 1000 ms | 3149 | +0.6% [−1.4, +2.7] | 0.26 |
+| ≥ 5 bp | 1467 | +6.5% | < 0.001 |
+| Coinbase ≥ 3 bp | 7076 | +4.4% | < 0.001 |
+
+- TEST per day: 11-15 evening +12.4%, 11-16 +3.5%, 11-17 +6.1%, 11-18 +5.3%, 11-19 +1.8%, **11-20 +1.3% (2,056
+  fills)**. At 1000 ms: +5.7%, +2.1%, +3.0%, +0.6%, −0.7%, −0.7%. The first five days give exactly last night's numbers.
+- 11-20 had 2.4× the fills of a normal day, mostly 14–20 UTC, when Binance printed twice the usual number of trades per hour (a
+  volatile afternoon). The Polymarket "trading is disabled" pause (503s at 06:02) is not the cause: that hour has 13 fills.
+  More signals did not mean more edge: ROI per fill was the lowest so far.
+- `real_vs_paper.py` rerun: same as last night (no real orders since the cap). Real −$21.45 on 244 settled fills;
+  paper on the same signals +5.2%, killed ones +9.7% (p ≈ 0.001), filled ones −1.6%. summary.json: cap 29.09/30,
+  wallet cash $6.08, real settled −$23.84.
+- Health 23:17 UTC: recorder up (memory self-restarts 00:39, 09:19, 19:14; `fix_gz.py` found nothing), every counter
+  rising, `cl` too (35 Chainlink "no price for 30 s" reconnects in 26 h, harmless). Trader up (self-restarts 22:19,
+  22:59; 6,758 decisions), paper since 11-17: 5,911 settled, +2.4% (100 sh), +3.4% (5 sh). Disk 17 GB free.
+- **Ready for the verdict session (11-22 07:30 UTC):** `out/live_replay.json` holds all 6 finished days; it may add
+  11-21 with `live_replay.py` (no arguments, ~10 min) and rerun `real_vs_paper.py` (seconds). By the rule written
+  on 11-15: the replay half passes (p < 0.001, 6/6 days positive); the real-order half fails clearly (27% vs 81% fill
+  rate, and the fills we do get are the signals with no edge). That points to stop, unless the verdict session sees
+  something these numbers miss.
