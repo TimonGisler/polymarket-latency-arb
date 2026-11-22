@@ -385,3 +385,11 @@ At 1000 ms (about what our real orders take) −0.3%, p ≈ 0.63. Real orders: 2
   Disk 16 GB free.
 - Recommendation for the owner: stop the recorder and the nightly task, and archive. The only variant worth a new
   test would be the maker version (quotes pulled on Binance moves), but that is a different idea.
+
+## 2026-11-22 (nightly session, 23:17 UTC; health only, after the verdict)
+**All healthy; nothing new to test. The owner has not chosen an option yet, so the recorder keeps running and the trader stays stopped.**
+- Recorder up (memory self-restarts 06:24 and 14:49; `fix_gz.py` found nothing), every counter rising, `cl` too (24
+  Chainlink "no price for 30 s" reconnects in 24 h, harmless). Trader stopped since the verdict (07:32), as intended.
+  No real orders since the cap, so wallet cash stays $6.08. Disk 16 GB free.
+- No replay tonight: the verdict is written, and the plan says health only until the owner decides. No new push to the phone (the
+  verdict was sent this morning).
