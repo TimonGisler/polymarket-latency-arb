@@ -17,7 +17,7 @@ services:
   trader:                                 # trader.py: the fixed rule in real time; paper always, plus real 5-share orders ($30 loss cap, plan step 4)
     image: pmbot
     container_name: latency-trader
-    command: python -u trader.py --live     # without --live: paper only, no key needed
+    command: python -u trader.py            # paper only since the verdict 2026-11-22 (was --live: real 5-share orders)
     env_file: .env.wallet                   # PK, only this container (docs/AUTOPILOT.md "Limits")
     working_dir: /app
     volumes:

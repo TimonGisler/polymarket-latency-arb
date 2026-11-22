@@ -353,3 +353,35 @@ orders take) it's +0.6%, p ≈ 0.26, negative on both of the last two days. Real
   on 11-15: the replay half passes (p < 0.001, 6/6 days positive); the real-order half fails clearly (27% vs 81% fill
   rate, and the fills we do get are the signals with no edge). That points to stop, unless the verdict session sees
   something these numbers miss.
+
+## 2026-11-22 (verdict session, 07:30 UTC)
+**VERDICT: STOP.** By the rule written on 11-15, the replay half passes and the real-order half fails clearly.
+**Replay, fixed test, 7 days (150 h): +3.0% ROI, 95% CI [+1.4, +4.6]%, p < 0.001, 7,813 fills, 7/7 days positive.
+At 1000 ms (about what our real orders take) −0.3%, p ≈ 0.63. Real orders: 27% of 890 filled vs 81% on paper,
+−$21.45 on 244 settled fills (≈ −$23.9 by wallet cash). Paper made +9.7% on the orders that were killed and −1.6% on the ones that filled.**
+
+| row (150 h; sensitivity rows are not the verdict) | fills | ROI [95% CI] | p | days + |
+|---|---|---|---|---|
+| TEST: Binance ≥ 3 bp, 250 ms | 7813 | +3.0% [+1.4, +4.6] | < 0.001 | 7/7 |
+| exec 200 ms | 8135 | +3.6% | < 0.001 | 7/7 |
+| exec 350 ms | 7151 | +2.8% | 0.001 | 7/7 |
+| exec 500 ms | 6265 | +1.9% [+0.2, +3.5] | 0.013 | 6/7 |
+| exec 1000 ms | 4692 | −0.3% [−2.1, +1.5] | 0.63 | 4/7 |
+| ≥ 5 bp | 2485 | +6.0% | < 0.001 | 7/7 |
+| Coinbase ≥ 3 bp | 9591 | +4.4% | < 0.001 | 7/7 |
+
+- TEST per day: 11-15 evening +12.4%, 11-16 +3.5%, 11-17 +6.1%, 11-18 +5.3%, 11-19 +1.8%, 11-20 +1.3%, **11-21
+  +2.3% (2,296 fills)**. At 1000 ms: +5.7, +2.1, +3.0, +0.6, −0.7, −0.7, **−2.5%**. The first 6 days reproduce last night.
+- Fill rate: the replay fills 86% of decisions at 250 ms and 52% at 1000 ms. Real orders filled 27%, worse than even
+  the 1000 ms row. `real_vs_paper.py` rerun: unchanged (no real orders since the cap, 11-20 06:02). Per day real /
+  paper: 11-18 +$1.84 / +$19.52, 11-19 −$11.44 / +$62.19, 11-20 −$11.85 / +$37.85.
+- Why it's a stop and not "one more week": 890 real orders settle the fill question, and the cause is Polymarket's
+  ~0.6–0.8 s answer time (median ack 625 ms in summary.json), which neither code speed nor server location changes.
+  The 5 bp and Coinbase rows look better, but they are sensitivity rows and they also assume 250 ms execution.
+- Actions: trader stopped (`docker compose stop trader`), and `docker-compose.yml` no longer passes `--live`, so a later
+  `compose up` only trades on paper. Recorder left running. Wallet cash $6.08 left in place (no session moves money).
+- Health 07:30 UTC: recorder up (memory self-restart 06:24; `fix_gz.py` found nothing), every counter rising, `cl`
+  too. Trader was up until stopped (cap 29.09/30, paper since 11-17: 6,119 settled, +2.9% at 100 sh, +4.0% at 5 sh).
+  Disk 16 GB free.
+- Recommendation for the owner: stop the recorder and the nightly task, and archive. The only variant worth a new
+  test would be the maker version (quotes pulled on Binance moves), but that is a different idea.
