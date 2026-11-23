@@ -393,3 +393,10 @@ At 1000 ms (about what our real orders take) −0.3%, p ≈ 0.63. Real orders: 2
   No real orders since the cap, so wallet cash stays $6.08. Disk 16 GB free.
 - No replay tonight: the verdict is written, and the plan says health only until the owner decides. No new push to the phone (the
   verdict was sent this morning).
+
+## 2026-11-23 (nightly session, 23:17 UTC; health only, after the verdict)
+**All healthy; still waiting for the owner's choice (README "Where it stands"). Recorder keeps running, trader stays stopped.**
+- Recorder up (memory self-restarts 11-22 23:49, 11-23 07:19 and 16:44; `fix_gz.py` found nothing), every counter rising, `cl` too (25 Chainlink
+  "no price for 30 s" reconnects in 24 h, harmless). Trader stopped since the verdict (11-22 07:32). No real orders, wallet cash
+  stays $6.08. Disk 15 GB free.
+- No replay and no push to the phone: health only until the owner decides.
