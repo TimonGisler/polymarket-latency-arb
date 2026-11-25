@@ -407,3 +407,10 @@ At 1000 ms (about what our real orders take) −0.3%, p ≈ 0.63. Real orders: 2
   "no price for 30 s" reconnects in 24 h, harmless). Trader stopped since the verdict (11-22 07:32). No real orders, wallet cash
   stays $6.08. Disk 15 GB free.
 - No replay and no push to the phone: health only until the owner decides.
+
+## 2026-11-25 (nightly session, 23:17 UTC; health only, after the verdict)
+**All healthy; still waiting for the owner's choice (README "Where it stands"). Recorder keeps running, trader stays stopped.**
+- Recorder up (memory self-restarts 08:24 and 18:09; `fix_gz.py` found nothing), every counter rising, `cl` too (25 Chainlink
+  "no price for 30 s" reconnects in 24 h, harmless). Trader stopped since the verdict (11-22 07:32). No real orders, wallet cash
+  stays $6.08. Disk 14 GB free.
+- No replay and no push to the phone: health only until the owner decides.
