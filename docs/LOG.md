@@ -422,3 +422,10 @@ At 1000 ms (about what our real orders take) −0.3%, p ≈ 0.63. Real orders: 2
   stays $6.08. Disk 14 GB free.
 - Note: a full `fix_gz.py` pass over all hours now takes over 5 min (it tests every file since 11-15); checking only the restart hours is enough.
 - No replay and no push to the phone: health only until the owner decides.
+
+## 2026-11-27 (nightly session, 23:17 UTC; health only, after the verdict)
+**All healthy; still waiting for the owner's choice (README "Where it stands"). Recorder keeps running, trader stays stopped.**
+- Recorder up (memory self-restarts 03:39 and 13:09; their hour files pass `gzip -t`), every counter rising, `cl` too (26 Chainlink
+  "no price for 30 s" reconnects in 24 h, harmless). Trader stopped since the verdict (11-22 07:32). No real orders, wallet cash
+  stays $6.08. Disk 13 GB free.
+- No replay and no push to the phone: health only until the owner decides.
